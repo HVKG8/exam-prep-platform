@@ -3,7 +3,11 @@ const express = require("express");
 const app = express();
 
 app.get("/", (req, res) => {
-  res.send("Server is running");
+  res.send("Exam Prep server is running");
+});
+
+app.get("/about", (req, res) => {
+  res.send("An app to help students prepare for exams");
 });
 
 app.listen(5000, () => {
