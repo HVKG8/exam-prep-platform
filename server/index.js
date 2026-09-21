@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const connectDB = require("./config/db");
+const Subject = require("./models/Subject");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -13,6 +14,11 @@ app.get("/", (req, res) => {
 
 app.get("/about", (req, res) => {
   res.send("An app to help students prepare for exams");
+});
+
+app.get("/api/subjects", async (req, res) => {
+  const subjects = await Subject.find();
+  res.json(subjects);
 });
 
 app.listen(5000, () => {
