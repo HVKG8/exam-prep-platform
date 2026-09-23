@@ -26,5 +26,13 @@ router.post("/solve", protect, async (req, res) => {
     res.status(500).json({ message: "AI request failed", error: error.message });
   }
 });
+router.get("/history", protect, async (req, res) => {
+  try {
+    const history = await Question.find({ student: req.user._id }).sort({ createdAt: -1 });
+    res.json(history);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch history", error: error.message });
+  }
+});
 
 module.exports = router;
