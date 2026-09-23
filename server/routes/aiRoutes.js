@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { askGemini } = require("../services/aiService");
 const { protect } = require("../middleware/authMiddleware");
+const Question = require("../models/Question");
 
 router.post("/solve", protect, async (req, res) => {
   try {
@@ -12,7 +13,15 @@ router.post("/solve", protect, async (req, res) => {
     }
 
     const answer = await askGemini(question, marks);
-    res.json({ question, marks, answer });
+
+    const saved = await Question.create({
+      student: req.user._id,
+      question,
+      marks,
+      answer,
+    });
+
+    res.json(saved);
   } catch (error) {
     res.status(500).json({ message: "AI request failed", error: error.message });
   }
