@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const Subject = require("./models/Subject");
 const Branch = require("./models/Branch");
 const Topic = require("./models/Topic");
+const Note = require("./models/Note");
 
 const seed = async () => {
   await mongoose.connect(process.env.MONGODB_URI);
@@ -36,6 +37,19 @@ const seed = async () => {
    } else {
      console.log("Topic already exists, reusing it");
    }
+
+    let note = await Note.findOne({ title: "Binary Search Basics" });
+    if (!note) {
+      note = await Note.create({
+        title: "Binary Search Basics",
+        topic: topic._id,
+        content: "Binary search works on a sorted array by repeatedly dividing the search range in half...",
+      });
+      console.log("Note created:", note.title);
+    } else {
+      console.log("Note already exists:", note.title);
+    }
+    
   await mongoose.disconnect();
 };
 
