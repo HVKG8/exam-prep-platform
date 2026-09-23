@@ -2,6 +2,7 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 const Subject = require("./models/Subject");
 const Branch = require("./models/Branch");
+const Topic = require("./models/Topic");
 
 const seed = async () => {
   await mongoose.connect(process.env.MONGODB_URI);
@@ -15,17 +16,26 @@ const seed = async () => {
   }
 
   let subject = await Subject.findOne({ name: "Artificial Intelligence", semester: 7 });
-if (!subject) {
-  subject = await Subject.create({
-    name: "Artificial Intelligence",
-    semester: 7,
-    branch: branch._id
-  });
-  console.log("Subject saved");
-} else {
-  console.log("Subject already exists, reusing it");
-}
-
+   if (!subject) {
+     subject = await Subject.create({
+       name: "Artificial Intelligence",
+       semester: 7,
+       branch: branch._id
+   });
+     console.log("Subject saved");
+   } else {
+     console.log("Subject already exists, reusing it");
+   }
+   let topic = await Topic.findOne({ title: "Search Algorithms", subject: subject._id });
+   if (!topic) {
+     topic = await Topic.create({
+       title: "Search Algorithms",
+       subject: subject._id
+    });
+     console.log("Topic saved");
+   } else {
+     console.log("Topic already exists, reusing it");
+   }
   await mongoose.disconnect();
 };
 
