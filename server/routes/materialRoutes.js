@@ -3,6 +3,7 @@ const router = express.Router();
 const { protect, teacherOrAdmin } = require("../middleware/authMiddleware");
 const upload = require("../middleware/upload");
 const Material = require("../models/Material");
+require("../models/Subject");
 
 // Upload a new material (teacher or admin only)
 router.post("/", protect, teacherOrAdmin, upload.single("file"), async (req, res) => {
@@ -28,6 +29,23 @@ router.post("/", protect, teacherOrAdmin, upload.single("file"), async (req, res
     res.status(201).json(material);
   } catch (err) {
     res.status(400).json({ message: err.message });
+  }
+});
+
+// List materials (any logged-in user), with optional filters
+router.get("/", protect, async (req, res) => {
+  try {
+    const filter = {};
+    if (req.query.subject) filter.subject = req.query.subject;
+    if (req.query.type) filter.type = req.query.type;
+
+    const materials = await Material.find(filter)
+      .populate("subject", "name")
+      .sort({ createdAt: -1 });
+
+    res.json(materials);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 
