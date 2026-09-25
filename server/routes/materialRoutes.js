@@ -70,4 +70,25 @@ router.get("/:id/download", protect, async (req, res) => {
   }
 });
 
+// Delete a material (teacher or admin only)
+router.delete("/:id", protect, teacherOrAdmin, async (req, res) => {
+  try {
+    const material = await Material.findById(req.params.id);
+    if (!material) {
+      return res.status(404).json({ message: "Material not found" });
+    }
+
+    const fullPath = path.join(__dirname, "..", "uploads", material.filePath);
+    if (fs.existsSync(fullPath)) {
+      fs.unlinkSync(fullPath);
+    }
+
+    await material.deleteOne();
+
+    res.json({ message: "Material deleted" });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
 module.exports = router;
