@@ -1,0 +1,38 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--space-lg);
+}
+
+.navbar-link {
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.navbar-link:hover {
+  color: var(--color-primary);
+}
+
+.navbar-spacer {
+  flex: 1;
+}
+
+.logout-btn {
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-xs) var(--space-md);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-family: var(--font-sans);
+}
+
+.logout-btn:hover {
+  border-color: var(--color-error);
+  color: var(--color-error);
+}

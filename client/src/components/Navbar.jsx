@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
+import './Navbar.css';
 
 function Navbar() {
   const navigate = useNavigate();
@@ -9,12 +10,13 @@ function Navbar() {
   };
 
   return (
-    <nav style={{ padding: '10px', borderBottom: '1px solid #ccc', marginBottom: '20px' }}>
-      <Link to="/dashboard" style={{ marginRight: '15px' }}>Dashboard</Link>
-      <Link to="/solver" style={{ marginRight: '15px' }}>AI Solver</Link>
-      <Link to="/materials" style={{ marginRight: '15px' }}>Materials</Link>
-      <Link to="/history" style={{ marginRight: '15px' }}>History</Link>
-      <button onClick={handleLogout}>Logout</button>
+    <nav className="navbar">
+      <Link to="/dashboard" className="navbar-link">Dashboard</Link>
+      <Link to="/solver" className="navbar-link">AI Solver</Link>
+      <Link to="/materials" className="navbar-link">Materials</Link>
+      <Link to="/history" className="navbar-link">History</Link>
+      <div className="navbar-spacer"></div>
+      <button onClick={handleLogout} className="logout-btn">Logout</button>
     </nav>
   );
 }
