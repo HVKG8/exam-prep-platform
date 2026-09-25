@@ -1,8 +1,41 @@
+import { useState, useEffect } from 'react'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
+
 function Dashboard() {
+  const [user, setUser] = useState(null)
+  const [error, setError] = useState('')
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const token = localStorage.getItem('token')
+        const response = await axios.get('http://localhost:5000/api/auth/me', {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        setUser(response.data)
+      } catch (err) {
+        setError('Could not load user info')
+      }
+    }
+    fetchUser()
+  }, [])
+
+  function handleLogout() {
+    localStorage.removeItem('token')
+    navigate('/login')
+  }
+
+  if (error) return <p style={{ color: 'red' }}>{error}</p>
+  if (!user) return <p>Loading...</p>
+
   return (
     <div>
       <h1>Dashboard</h1>
-      <p>Welcome! You are logged in.</p>
+      <p>Welcome, {user.name}!</p>
+      <p>Role: {user.role}</p>
+      <button onClick={handleLogout}>Logout</button>
     </div>
   )
 }
