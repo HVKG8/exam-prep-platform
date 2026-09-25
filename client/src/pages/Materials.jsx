@@ -90,6 +90,21 @@ function Materials() {
     window.open(`http://localhost:5000/api/materials/${id}/download?token=${token}`, '_blank');
   };
 
+  const handleDelete = async (id) => {
+    const confirmed = window.confirm('Are you sure you want to delete this material?');
+    if (!confirmed) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:5000/api/materials/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchMaterials();
+    } catch (err) {
+      alert('Failed to delete material.');
+    }
+  };
+
   const handleUpload = async (e) => {
     e.preventDefault();
     if (!uploadFile || !uploadTitle || !uploadSubject) {
@@ -187,6 +202,14 @@ function Materials() {
             <button onClick={() => handleDownload(m._id)} style={{ marginLeft: '10px' }}>
               Download
             </button>
+            {(userRole === 'teacher' || userRole === 'admin') && (
+              <button
+                onClick={() => handleDelete(m._id)}
+                style={{ marginLeft: '10px', color: 'red' }}
+              >
+                Delete
+              </button>
+            )}
           </li>
         ))}
       </ul>
