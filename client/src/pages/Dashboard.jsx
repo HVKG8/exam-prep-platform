@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 
 function Dashboard() {
   const [user, setUser] = useState(null)
@@ -35,6 +35,7 @@ function Dashboard() {
       <h1>Dashboard</h1>
       <p>Welcome, {user.name}!</p>
       <p>Role: {user.role}</p>
+      <Link to="/solver">Go to AI Solver</Link>
       <button onClick={handleLogout}>Logout</button>
     </div>
   )
