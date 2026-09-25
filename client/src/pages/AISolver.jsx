@@ -1,13 +1,31 @@
 import { useState } from 'react';
+import axios from 'axios';
 
 function AISolver() {
   const [question, setQuestion] = useState('');
   const [marks, setMarks] = useState('');
+  const [answer, setAnswer] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Question:', question);
-    console.log('Marks:', marks);
+    setLoading(true);
+    setAnswer('');
+
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.post(
+        'http://localhost:5000/api/ai/solve',
+        { question, marks },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setAnswer(res.data.answer);
+    } catch (err) {
+      console.error(err);
+      setAnswer('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -31,8 +49,17 @@ function AISolver() {
             onChange={(e) => setMarks(e.target.value)}
           />
         </div>
-        <button type="submit">Get Answer</button>
+        <button type="submit" disabled={loading}>
+          {loading ? 'Solving...' : 'Get Answer'}
+        </button>
       </form>
+
+      {answer && (
+        <div style={{ marginTop: '20px', whiteSpace: 'pre-wrap' }}>
+          <h3>Answer:</h3>
+          <p>{answer}</p>
+        </div>
+      )}
     </div>
   );
 }
