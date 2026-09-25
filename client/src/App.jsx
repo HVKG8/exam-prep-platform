@@ -1,13 +1,27 @@
 import { useState } from 'react'
+import axios from 'axios'
 
 function App() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
-    console.log('Email:', email)
-    console.log('Password:', password)
+    setError('')
+    setSuccess('')
+
+    try {
+      const response = await axios.post('http://localhost:5000/api/auth/login', {
+        email,
+        password,
+      })
+      localStorage.setItem('token', response.data.token)
+      setSuccess('Login successful!')
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed')
+    }
   }
 
   return (
@@ -33,6 +47,8 @@ function App() {
         </div>
         <button type="submit">Login</button>
       </form>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {success && <p style={{ color: 'green' }}>{success}</p>}
     </div>
   )
 }

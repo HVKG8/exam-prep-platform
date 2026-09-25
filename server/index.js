@@ -6,8 +6,10 @@ const authRoutes = require("./routes/authRoutes");
 const topicRoutes = require("./routes/topicRoutes");
 const noteRoutes = require("./routes/noteRoutes");
 const materialRoutes = require("./routes/materialRoutes");
+const cors = require("cors");
 
 const app = express();
+app.use(cors());
 const PORT = process.env.PORT || 5000;
 
 connectDB();
