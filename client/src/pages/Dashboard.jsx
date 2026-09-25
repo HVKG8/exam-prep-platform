@@ -36,6 +36,7 @@ function Dashboard() {
       <p>Welcome, {user.name}!</p>
       <p>Role: {user.role}</p>
       <Link to="/solver">Go to AI Solver</Link>
+      <Link to="/materials" style={{ marginLeft: '10px' }}>Go to Materials</Link>
       <button onClick={handleLogout}>Logout</button>
     </div>
   )
