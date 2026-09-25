@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import Navbar from '../components/Navbar'
+import './Dashboard.css'
 
 function Dashboard() {
   const [user, setUser] = useState(null)
@@ -21,15 +22,34 @@ function Dashboard() {
     fetchUser()
   }, [])
 
-  if (error) return <p style={{ color: 'red' }}>{error}</p>
-  if (!user) return <p>Loading...</p>
+  if (error) return (
+    <div>
+      <Navbar />
+      <div className="page-container">
+        <p className="error-text">{error}</p>
+      </div>
+    </div>
+  )
+
+  if (!user) return (
+    <div>
+      <Navbar />
+      <div className="page-container">
+        <p>Loading...</p>
+      </div>
+    </div>
+  )
 
   return (
     <div>
       <Navbar />
-      <h1>Dashboard</h1>
-      <p>Welcome, {user.name}!</p>
-      <p>Role: {user.role}</p>
+      <div className="page-container">
+        <h1>Dashboard</h1>
+        <div className="card welcome-card">
+          <p>Welcome, {user.name}!</p>
+          <span className="role-badge">{user.role}</span>
+        </div>
+      </div>
     </div>
   )
 }
