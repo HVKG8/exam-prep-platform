@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import Navbar from '../components/Navbar';
 
 function AISolver() {
   const [question, setQuestion] = useState('');
@@ -30,6 +31,7 @@ function AISolver() {
 
   return (
     <div>
+      <Navbar />
       <h2>AI Solver</h2>
       <form onSubmit={handleSubmit}>
         <div>

@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import { useNavigate, Link } from 'react-router-dom'
+import Navbar from '../components/Navbar'
 
 function Dashboard() {
   const [user, setUser] = useState(null)
   const [error, setError] = useState('')
-  const navigate = useNavigate()
 
   useEffect(() => {
     async function fetchUser() {
@@ -22,22 +21,15 @@ function Dashboard() {
     fetchUser()
   }, [])
 
-  function handleLogout() {
-    localStorage.removeItem('token')
-    navigate('/login')
-  }
-
   if (error) return <p style={{ color: 'red' }}>{error}</p>
   if (!user) return <p>Loading...</p>
 
   return (
     <div>
+      <Navbar />
       <h1>Dashboard</h1>
       <p>Welcome, {user.name}!</p>
       <p>Role: {user.role}</p>
-      <Link to="/solver">Go to AI Solver</Link>
-      <Link to="/materials" style={{ marginLeft: '10px' }}>Go to Materials</Link>
-      <button onClick={handleLogout}>Logout</button>
     </div>
   )
 }

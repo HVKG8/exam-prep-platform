@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import Navbar from '../components/Navbar';
 
 function Materials() {
   const [materials, setMaterials] = useState([]);
@@ -146,6 +147,7 @@ function Materials() {
 
   return (
     <div>
+      <Navbar />
       <h2>Study Materials</h2>
 
       <form onSubmit={handleSearch}>
