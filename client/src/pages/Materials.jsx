@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
+import './Materials.css';
 
 function Materials() {
   const [materials, setMaterials] = useState([]);
@@ -148,97 +149,106 @@ function Materials() {
   return (
     <div>
       <Navbar />
-      <h2>Study Materials</h2>
+      <div className="page-container">
+        <h1>Study Materials</h1>
 
-      <form onSubmit={handleSearch}>
-        <input
-          type="text"
-          placeholder="Search by title..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <button type="submit">Search</button>
-      </form>
+        <div className="materials-toolbar">
+          <form onSubmit={handleSearch} className="search-form">
+            <input
+              type="text"
+              className="input"
+              placeholder="Search by title..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <button type="submit" className="btn">Search</button>
+          </form>
 
-      <div style={{ marginTop: '10px' }}>
-        <select
-          value={subjectFilter}
-          onChange={(e) => {
-            setSubjectFilter(e.target.value);
-            handleFilterChange();
-          }}
-        >
-          <option value="">All Subjects</option>
-          {subjects.map((s) => (
-            <option key={s._id} value={s._id}>
-              {s.name}
-            </option>
+          <select
+            className="filter-select"
+            value={subjectFilter}
+            onChange={(e) => {
+              setSubjectFilter(e.target.value);
+              handleFilterChange();
+            }}
+          >
+            <option value="">All Subjects</option>
+            {subjects.map((s) => (
+              <option key={s._id} value={s._id}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+
+          <select
+            className="filter-select"
+            value={typeFilter}
+            onChange={(e) => {
+              setTypeFilter(e.target.value);
+              handleFilterChange();
+            }}
+          >
+            <option value="">All Types</option>
+            <option value="notes">Notes</option>
+            <option value="book">Book</option>
+            <option value="assignment">Assignment</option>
+            <option value="question-paper">Question Paper</option>
+            <option value="diagram">Diagram</option>
+          </select>
+        </div>
+
+        {loading && <p>Loading...</p>}
+        {error && <p className="error-text">{error}</p>}
+        {!loading && !error && materials.length === 0 && <p>No materials found.</p>}
+
+        <ul className="materials-list">
+          {materials.map((m) => (
+            <li key={m._id} className="material-item">
+              <span>
+                <strong>{m.title}</strong>
+                <span className="material-type">— {m.type} ({m.subject?.name})</span>
+              </span>
+              <div className="material-actions">
+                <button onClick={() => handleDownload(m._id)} className="btn-outline">
+                  Download
+                </button>
+                {(userRole === 'teacher' || userRole === 'admin') && (
+                  <button onClick={() => handleDelete(m._id)} className="btn-danger">
+                    Delete
+                  </button>
+                )}
+              </div>
+            </li>
           ))}
-        </select>
+        </ul>
 
-        <select
-          value={typeFilter}
-          onChange={(e) => {
-            setTypeFilter(e.target.value);
-            handleFilterChange();
-          }}
-          style={{ marginLeft: '10px' }}
-        >
-          <option value="">All Types</option>
-          <option value="notes">Notes</option>
-          <option value="book">Book</option>
-          <option value="assignment">Assignment</option>
-          <option value="question-paper">Question Paper</option>
-          <option value="diagram">Diagram</option>
-        </select>
-      </div>
-
-      {loading && <p>Loading...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {!loading && !error && materials.length === 0 && <p>No materials found.</p>}
-
-      <ul>
-        {materials.map((m) => (
-          <li key={m._id}>
-            <strong>{m.title}</strong> — {m.type} ({m.subject?.name})
-            <button onClick={() => handleDownload(m._id)} style={{ marginLeft: '10px' }}>
-              Download
-            </button>
-            {(userRole === 'teacher' || userRole === 'admin') && (
-              <button
-                onClick={() => handleDelete(m._id)}
-                style={{ marginLeft: '10px', color: 'red' }}
-              >
-                Delete
-              </button>
-            )}
-          </li>
-        ))}
-      </ul>
-
-      {(userRole === 'teacher' || userRole === 'admin') && (
-        <div style={{ marginTop: '30px', borderTop: '1px solid #ccc', paddingTop: '20px' }}>
-          <h3>Upload Material</h3>
-          <form onSubmit={handleUpload}>
-            <div>
+        {(userRole === 'teacher' || userRole === 'admin') && (
+          <div className="card upload-section">
+            <h3>Upload Material</h3>
+            <form onSubmit={handleUpload} className="upload-form">
               <input
                 type="text"
+                className="input"
                 placeholder="Title"
                 value={uploadTitle}
                 onChange={(e) => setUploadTitle(e.target.value)}
               />
-            </div>
-            <div style={{ marginTop: '8px' }}>
-              <select value={uploadType} onChange={(e) => setUploadType(e.target.value)}>
+              <select
+                className="input"
+                value={uploadType}
+                onChange={(e) => setUploadType(e.target.value)}
+              >
                 <option value="notes">Notes</option>
                 <option value="book">Book</option>
                 <option value="assignment">Assignment</option>
                 <option value="question-paper">Question Paper</option>
                 <option value="diagram">Diagram</option>
               </select>
-            </div>
-            <div style={{ marginTop: '8px' }}>
-              <select value={uploadSubject} onChange={(e) => setUploadSubject(e.target.value)}>
+              <select
+                className="input"
+                value={uploadSubject}
+                onChange={(e) => setUploadSubject(e.target.value)}
+              >
                 <option value="">Select Subject</option>
                 {subjects.map((s) => (
                   <option key={s._id} value={s._id}>
@@ -246,17 +256,15 @@ function Materials() {
                   </option>
                 ))}
               </select>
-            </div>
-            <div style={{ marginTop: '8px' }}>
               <input type="file" onChange={(e) => setUploadFile(e.target.files[0])} />
-            </div>
-            <button type="submit" disabled={uploading} style={{ marginTop: '8px' }}>
-              {uploading ? 'Uploading...' : 'Upload'}
-            </button>
-          </form>
-          {uploadMessage && <p>{uploadMessage}</p>}
-        </div>
-      )}
+              <button type="submit" className="btn" disabled={uploading}>
+                {uploading ? 'Uploading...' : 'Upload'}
+              </button>
+            </form>
+            {uploadMessage && <p className="upload-message">{uploadMessage}</p>}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
