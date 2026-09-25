@@ -13,6 +13,7 @@ function Navbar() {
       <Link to="/dashboard" style={{ marginRight: '15px' }}>Dashboard</Link>
       <Link to="/solver" style={{ marginRight: '15px' }}>AI Solver</Link>
       <Link to="/materials" style={{ marginRight: '15px' }}>Materials</Link>
+      <Link to="/history" style={{ marginRight: '15px' }}>History</Link>
       <button onClick={handleLogout}>Logout</button>
     </nav>
   );
