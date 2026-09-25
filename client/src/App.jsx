@@ -3,6 +3,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import ProtectedRoute from './components/ProtectedRoute'
+import AISolver from './pages/AISolver';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/solver" element={<ProtectedRoute><AISolver /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   )
