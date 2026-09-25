@@ -4,6 +4,8 @@ const { protect, teacherOrAdmin } = require("../middleware/authMiddleware");
 const upload = require("../middleware/upload");
 const Material = require("../models/Material");
 require("../models/Subject");
+const path = require("path");
+const fs = require("fs");
 
 // Upload a new material (teacher or admin only)
 router.post("/", protect, teacherOrAdmin, upload.single("file"), async (req, res) => {
@@ -46,6 +48,25 @@ router.get("/", protect, async (req, res) => {
     res.json(materials);
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+});
+
+// Download a material file (any logged-in user)
+router.get("/:id/download", protect, async (req, res) => {
+  try {
+    const material = await Material.findById(req.params.id);
+    if (!material) {
+      return res.status(404).json({ message: "Material not found" });
+    }
+
+    const fullPath = path.join(__dirname, "..", "uploads", material.filePath);
+    if (!fs.existsSync(fullPath)) {
+      return res.status(404).json({ message: "File is missing on the server" });
+    }
+
+    res.download(fullPath, material.fileName);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
   }
 });
 
