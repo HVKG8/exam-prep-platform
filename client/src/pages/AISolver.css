@@ -1,0 +1,26 @@
+.solver-form {
+  max-width: 600px;
+}
+
+.solver-form textarea.input {
+  resize: vertical;
+  font-family: var(--font-sans);
+}
+
+.marks-group {
+  max-width: 120px;
+}
+
+.answer-box {
+  margin-top: var(--space-xl);
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+.answer-box h3 {
+  margin-bottom: var(--space-sm);
+  color: var(--color-text-muted);
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}

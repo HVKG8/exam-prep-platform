@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
+import './AISolver.css';
 
 function AISolver() {
   const [question, setQuestion] = useState('');
@@ -32,36 +33,41 @@ function AISolver() {
   return (
     <div>
       <Navbar />
-      <h2>AI Solver</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Question: </label>
-          <textarea
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            rows={4}
-            cols={40}
-          />
+      <div className="page-container">
+        <h1>AI Solver</h1>
+        <div className="card solver-form">
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label>Question</label>
+              <textarea
+                className="input"
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                rows={4}
+              />
+            </div>
+            <div className="form-group marks-group">
+              <label>Marks</label>
+              <input
+                type="number"
+                className="input"
+                value={marks}
+                onChange={(e) => setMarks(e.target.value)}
+              />
+            </div>
+            <button type="submit" className="btn" disabled={loading}>
+              {loading ? 'Solving...' : 'Get Answer'}
+            </button>
+          </form>
         </div>
-        <div>
-          <label>Marks: </label>
-          <input
-            type="number"
-            value={marks}
-            onChange={(e) => setMarks(e.target.value)}
-          />
-        </div>
-        <button type="submit" disabled={loading}>
-          {loading ? 'Solving...' : 'Get Answer'}
-        </button>
-      </form>
 
-      {answer && (
-        <div style={{ marginTop: '20px', whiteSpace: 'pre-wrap' }}>
-          <h3>Answer:</h3>
-          <p>{answer}</p>
-        </div>
-      )}
+        {answer && (
+          <div className="card answer-box">
+            <h3>Answer</h3>
+            <p>{answer}</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
