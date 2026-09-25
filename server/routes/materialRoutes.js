@@ -91,4 +91,26 @@ router.delete("/:id", protect, teacherOrAdmin, async (req, res) => {
   }
 });
 
+// @route   GET /api/materials/search
+// @desc    Search materials by title
+router.get("/search", protect, async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    if (!query) {
+      return res.status(400).json({ message: "Search query is required" });
+    }
+
+    const materials = await Material.find({
+      title: { $regex: query, $options: "i" },
+    })
+      .populate("subject", "name")
+      .sort({ createdAt: -1 });
+
+    res.json(materials);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 module.exports = router;
