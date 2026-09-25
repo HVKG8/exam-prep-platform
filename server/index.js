@@ -31,6 +31,11 @@ app.use("/api/notes", noteRoutes);
 app.use("/api/ai", require("./routes/aiRoutes"));
 app.use("/api/materials", materialRoutes);
 
+app.use((err, req, res, next) => {
+  console.error("SERVER ERROR:", err);
+  res.status(500).json({ message: err.message || "Something went wrong" });
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

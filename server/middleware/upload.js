@@ -1,15 +1,17 @@
 const multer = require("multer");
 const path = require("path");
-const fs = require("fs");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("../config/cloudinary");
 
-const uploadDir = path.join(__dirname, "..", "uploads");
-fs.mkdirSync(uploadDir, { recursive: true });
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => {
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: (req, file) => {
     const uniqueName = Date.now() + "-" + file.originalname.replace(/\s+/g, "_");
-    cb(null, uniqueName);
+    return {
+      folder: "exam-prep-materials",
+      public_id: uniqueName,
+      resource_type: "auto", // lets Cloudinary handle PDFs/docs, not just images
+    };
   },
 });
 
@@ -27,7 +29,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 20 * 1024 * 1024 }, // YOUR TURN: 20 means 20 MB
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20 MB
 });
 
 module.exports = upload;

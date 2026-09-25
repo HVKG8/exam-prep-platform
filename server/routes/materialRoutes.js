@@ -3,9 +3,8 @@ const router = express.Router();
 const { protect, teacherOrAdmin } = require("../middleware/authMiddleware");
 const upload = require("../middleware/upload");
 const Material = require("../models/Material");
+const cloudinary = require("../config/cloudinary");
 require("../models/Subject");
-const path = require("path");
-const fs = require("fs");
 
 // Upload a new material (teacher or admin only)
 router.post("/", protect, teacherOrAdmin, upload.single("file"), async (req, res) => {
@@ -22,7 +21,8 @@ router.post("/", protect, teacherOrAdmin, upload.single("file"), async (req, res
       subject,
       topic: topic || undefined,
       fileName: req.file.originalname,
-      filePath: req.file.filename,
+      fileUrl: req.file.path,
+      publicId: req.file.filename,
       fileType: req.file.mimetype,
       fileSize: req.file.size,
       uploadedBy: req.user._id,
@@ -59,12 +59,7 @@ router.get("/:id/download", protect, async (req, res) => {
       return res.status(404).json({ message: "Material not found" });
     }
 
-    const fullPath = path.join(__dirname, "..", "uploads", material.filePath);
-    if (!fs.existsSync(fullPath)) {
-      return res.status(404).json({ message: "File is missing on the server" });
-    }
-
-    res.download(fullPath, material.fileName);
+    res.redirect(material.fileUrl);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -78,10 +73,7 @@ router.delete("/:id", protect, teacherOrAdmin, async (req, res) => {
       return res.status(404).json({ message: "Material not found" });
     }
 
-    const fullPath = path.join(__dirname, "..", "uploads", material.filePath);
-    if (fs.existsSync(fullPath)) {
-      fs.unlinkSync(fullPath);
-    }
+    await cloudinary.uploader.destroy(material.publicId, { resource_type: "image" });
 
     await material.deleteOne();
 
