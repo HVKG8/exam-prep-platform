@@ -6,6 +6,7 @@ import "./Sidebar.css";
 function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refreshTrigger }) {
   const [conversations, setConversations] = useState([]);
   const [user, setUser] = useState(null);
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -40,6 +41,11 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
     fetchUser();
   }, []);
 
+  useEffect(() => {
+  document.documentElement.classList.toggle("dark", theme === "dark");
+  localStorage.setItem("theme", theme);
+}, [theme]);
+
   const handleNewChat = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -55,6 +61,9 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
       console.error(error);
     }
   };
+ const toggleTheme = () => {
+  setTheme((prev) => (prev === "light" ? "dark" : "light"));
+};
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -86,6 +95,10 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
           </Link>
         ))}
       </nav>
+       
+    <button className="sidebar-theme-toggle" onClick={toggleTheme}>
+        {theme === "light" ? "🌙 Dark Mode" : "☀️ Light Mode"}
+      </button>
 
       <hr className="sidebar-divider" />
 

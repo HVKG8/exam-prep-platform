@@ -170,3 +170,23 @@
 .sidebar-logout-btn svg {
   flex-shrink: 0;
 }
+
+.sidebar-theme-toggle {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: #0b1120;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  color: #cbd5e1;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 12px;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: background-color 0.15s ease;
+}
+
+.sidebar-theme-toggle:hover {
+  background-color: #1e293b;
+}

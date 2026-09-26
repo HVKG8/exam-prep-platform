@@ -94,3 +94,15 @@ p {
 .page-container h1 {
   margin-bottom: var(--space-lg);
 }
+
+:root.dark {
+  --color-primary: #6366f1;
+  --color-primary-hover: #4f46e5;
+  --color-bg: #0b1120;
+  --color-surface: #111827;
+  --color-text: #e5e7eb;
+  --color-text-muted: #94a3b8;
+  --color-border: #1e293b;
+  --color-error: #f87171;
+  --color-success: #4ade80;
+}
