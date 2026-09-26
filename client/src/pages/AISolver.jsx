@@ -76,11 +76,13 @@ function AISolver() {
   const [marks, setMarks] = useState('');
   const [loading, setLoading] = useState(false);
   const textareaRef = useRef(null);
+  const chatScrollRef = useRef(null);
   const [selectedConversationId, setSelectedConversationId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [regeneratingIndex, setRegeneratingIndex] = useState(null);
+  const [pendingQuestion, setPendingQuestion] = useState('');
 
   useEffect(() => {
     const loadConversation = async () => {
@@ -102,8 +104,23 @@ function AISolver() {
     loadConversation();
   }, [selectedConversationId]);
 
+  // Auto-scroll to the bottom whenever messages change or a new question is pending
+  useEffect(() => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+    }
+  }, [messages, pendingQuestion]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const currentQuestion = question.trim();
+    if (!currentQuestion) return;
+
+    setPendingQuestion(currentQuestion);
+    setQuestion('');
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
     setLoading(true);
 
     try {
@@ -112,7 +129,7 @@ function AISolver() {
       // Step 1: get the AI answer
       const res = await axios.post(
         'http://localhost:5000/api/ai/solve',
-        { question, marks },
+        { question: currentQuestion, marks },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const newAnswer = res.data.answer;
@@ -132,43 +149,43 @@ function AISolver() {
       // Step 3: save this question+answer into the conversation
       await axios.post(
         `http://localhost:5000/api/conversations/${conversationId}/messages`,
-        { question, marks, answer: newAnswer },
+        { question: currentQuestion, marks, answer: newAnswer },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       // Step 4: show it immediately in the chat
       setMessages([
         ...messages,
-        { question, marks, answer: newAnswer, createdAt: new Date().toISOString() },
+        { question: currentQuestion, marks, answer: newAnswer, createdAt: new Date().toISOString() },
       ]);
-      setQuestion('');
       setRefreshTrigger((prev) => prev + 1);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
+      setPendingQuestion('');
     }
   };
 
   const handleRegenerate = async (index) => {
-  const msg = messages[index];
-  setRegeneratingIndex(index);
-  try {
-    const token = localStorage.getItem('token');
-    const res = await axios.post(
-      'http://localhost:5000/api/ai/solve',
-      { question: msg.question, marks: msg.marks },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    const updated = [...messages];
-    updated[index] = { ...updated[index], answer: res.data.answer };
-    setMessages(updated);
-  } catch (err) {
-    console.error(err);
-  } finally {
-    setRegeneratingIndex(null);
-  }
-};
+    const msg = messages[index];
+    setRegeneratingIndex(index);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.post(
+        'http://localhost:5000/api/ai/solve',
+        { question: msg.question, marks: msg.marks },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const updated = [...messages];
+      updated[index] = { ...updated[index], answer: res.data.answer };
+      setMessages(updated);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setRegeneratingIndex(null);
+    }
+  };
 
   const handleCopy = (index, answerObj) => {
     navigator.clipboard.writeText(answerToPlainText(answerObj));
@@ -185,7 +202,7 @@ function AISolver() {
     }
   };
 
-    return (
+  return (
     <div style={{ display: 'flex' }}>
       <Sidebar
         selectedConversationId={selectedConversationId}
@@ -205,8 +222,8 @@ function AISolver() {
           <div className="solver-header-badge">✨ Ask · Learn · Excel</div>
         </div>
 
-        <div className="solver-chat-scroll">
-          {messages.length > 0 && (
+        <div className="solver-chat-scroll" ref={chatScrollRef}>
+          {(messages.length > 0 || pendingQuestion) && (
             <div className="chat-thread">
               {messages.map((msg, index) => (
                 <div key={index} className="chat-message-group">
@@ -243,6 +260,26 @@ function AISolver() {
                   </div>
                 </div>
               ))}
+
+              {pendingQuestion && (
+                <div className="chat-message-group">
+                  <div className="chat-row user-row">
+                    <div className="chat-bubble user-bubble">
+                      <p>{pendingQuestion}</p>
+                    </div>
+                    <div className="chat-avatar user-avatar">🧑</div>
+                  </div>
+
+                  <div className="chat-row assistant-row">
+                    <div className="chat-avatar bot-avatar">🤖</div>
+                    <div className="chat-bubble assistant-bubble typing-bubble">
+                      <span className="typing-dot"></span>
+                      <span className="typing-dot"></span>
+                      <span className="typing-dot"></span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -277,7 +314,6 @@ function AISolver() {
               onChange={handleQuestionChange}
               rows={1}
             />
-            <span className="input-bar-icon">🎤</span>
             <button type="submit" className="solver-send-btn" disabled={loading}>
               {loading ? '…' : '➤'}
             </button>
