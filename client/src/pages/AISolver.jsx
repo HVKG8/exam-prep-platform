@@ -9,6 +9,17 @@ function formatLabel(key) {
   return key.charAt(0).toUpperCase() + key.slice(1);
 }
 
+function answerToPlainText(answer) {
+  return Object.entries(answer)
+    .filter(([, value]) => value !== null && value !== undefined && value !== '')
+    .map(([key, value]) => {
+      const label = formatLabel(key);
+      const text = Array.isArray(value) ? value.join('\n- ') : value;
+      return `${label}:\n${Array.isArray(value) ? '- ' + text : text}`;
+    })
+    .join('\n\n');
+}
+
 function AnswerSection({ label, value }) {
   if (value === null || value === undefined || value === '') return null;
 
@@ -43,11 +54,14 @@ function AISolver() {
   const [answer, setAnswer] = useState(null);
   const [loading, setLoading] = useState(false);
   const textareaRef = useRef(null);
+  const [submittedQuestion, setSubmittedQuestion] = useState('');
+  const [copied, setCopied] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setAnswer(null);
+    setSubmittedQuestion(question);
 
     try {
       const token = localStorage.getItem('token');
@@ -64,6 +78,12 @@ function AISolver() {
       setLoading(false);
     }
   };
+
+  const handleCopy = () => {
+  navigator.clipboard.writeText(answerToPlainText(answer));
+  setCopied(true);
+  setTimeout(() => setCopied(false), 2000);
+};
 
   const handleQuestionChange = (e) => {
   setQuestion(e.target.value);
@@ -106,13 +126,24 @@ function AISolver() {
           </form>
         </div>
 
-        {answer && (
-          <div className="card answer-box">
-            {Object.entries(answer).map(([key, value]) => (
-              <AnswerSection key={key} label={key} value={value} />
-            ))}
-          </div>
-        )}
+        {submittedQuestion && (
+  <div className="chat-thread">
+    <div className="chat-bubble user-bubble">
+      <p>{submittedQuestion}</p>
+    </div>
+
+    {answer && (
+  <div className="chat-bubble assistant-bubble">
+    {Object.entries(answer).map(([key, value]) => (
+      <AnswerSection key={key} label={key} value={value} />
+    ))}
+    <button onClick={handleCopy} className="btn-outline copy-btn">
+      {copied ? 'Copied!' : 'Copy'}
+    </button>
+  </div>
+)}
+  </div>
+)}
       </div>
     </div>
   );

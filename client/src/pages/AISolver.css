@@ -64,3 +64,37 @@
   border-radius: var(--radius);
   padding: var(--space-md);
 }
+
+.chat-thread {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: var(--space-xl);
+}
+
+.chat-bubble {
+  max-width: 80%;
+  padding: var(--space-md);
+  border-radius: var(--radius);
+}
+
+.user-bubble {
+  align-self: flex-end;
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.user-bubble p {
+  margin: 0;
+}
+
+.assistant-bubble {
+  align-self: flex-start;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow);
+}
+
+.copy-btn {
+  margin-top: var(--space-md);
+}
