@@ -120,7 +120,6 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
       );
       setConversations([res.data, ...conversations]);
       if (onSelectConversation) onSelectConversation(res.data._id);
-      if (onNewChat) onNewChat();
     } catch (error) {
       console.error(error);
     }
