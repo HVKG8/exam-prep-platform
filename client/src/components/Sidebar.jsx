@@ -6,6 +6,7 @@ import "./Sidebar.css";
 function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refreshTrigger }) {
   const [conversations, setConversations] = useState([]);
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
   const [renamingId, setRenamingId] = useState(null);
   const [renameValue, setRenameValue] = useState("");
@@ -51,9 +52,12 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
   }, [theme]);
 
   useEffect(() => {
-    const closeMenu = () => setOpenMenuId(null);
-    document.addEventListener("click", closeMenu);
-    return () => document.removeEventListener("click", closeMenu);
+    const closeMenus = () => {
+      setOpenMenuId(null);
+      setProfileOpen(false);
+    };
+    document.addEventListener("click", closeMenus);
+    return () => document.removeEventListener("click", closeMenus);
   }, []);
 
   const handleConfirmDelete = async (e, id) => {
@@ -230,23 +234,38 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
       </ul>
 
       {user && (
-        <div className="sidebar-footer">
-          <div className="sidebar-avatar">{user.name.charAt(0).toUpperCase()}</div>
-          <div>
-            <p className="sidebar-username">{user.name}</p>
-            <p className="sidebar-role">{user.role}</p>
+        <div className="sidebar-profile-wrapper">
+          {profileOpen && (
+            <div className="sidebar-profile-panel" onClick={(e) => e.stopPropagation()}>
+              <p className="sidebar-profile-role-line">
+                Role: <span>{user.role}</span>
+              </p>
+              <button onClick={handleLogout} className="sidebar-logout-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+                Logout
+              </button>
+            </div>
+          )}
+          <div
+            className="sidebar-footer"
+            onClick={(e) => {
+              e.stopPropagation();
+              setProfileOpen((prev) => !prev);
+            }}
+          >
+            <div className="sidebar-avatar">{user.name.charAt(0).toUpperCase()}</div>
+            <div className="sidebar-footer-text">
+              <p className="sidebar-username">{user.name}</p>
+              <p className="sidebar-role">{user.role}</p>
+            </div>
+            <span className="sidebar-profile-chevron">{profileOpen ? '▾' : '▸'}</span>
           </div>
         </div>
       )}
-
-      <button onClick={handleLogout} className="sidebar-logout-btn">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-          <polyline points="16 17 21 12 16 7" />
-          <line x1="21" y1="12" x2="9" y2="12" />
-        </svg>
-        Logout
-      </button>
     </div>
   );
 }
