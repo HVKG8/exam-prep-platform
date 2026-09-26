@@ -3,8 +3,11 @@
 }
 
 .solver-form textarea.input {
-  resize: vertical;
+  resize: none;
   font-family: var(--font-sans);
+  overflow-y: auto;
+  max-height: 200px;
+  transition: height 0.1s ease;
 }
 
 .marks-group {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState , useRef } from 'react';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import './AISolver.css';
@@ -42,6 +42,7 @@ function AISolver() {
   const [marks, setMarks] = useState('');
   const [answer, setAnswer] = useState(null);
   const [loading, setLoading] = useState(false);
+  const textareaRef = useRef(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -64,6 +65,15 @@ function AISolver() {
     }
   };
 
+  const handleQuestionChange = (e) => {
+  setQuestion(e.target.value);
+  const textarea = textareaRef.current;
+  if (textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }
+};
+
   return (
     <div>
       <Navbar />
@@ -74,10 +84,11 @@ function AISolver() {
             <div className="form-group">
               <label>Question</label>
               <textarea
+                ref={textareaRef}
                 className="input"
                 value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                rows={4}
+                onChange={handleQuestionChange}
+                rows={2}
               />
             </div>
             <div className="form-group marks-group">
