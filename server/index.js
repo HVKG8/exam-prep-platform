@@ -6,6 +6,7 @@ const authRoutes = require("./routes/authRoutes");
 const topicRoutes = require("./routes/topicRoutes");
 const noteRoutes = require("./routes/noteRoutes");
 const materialRoutes = require("./routes/materialRoutes");
+const conversationRoutes = require("./routes/conversationRoutes");
 const cors = require("cors");
 
 const app = express();
@@ -30,6 +31,7 @@ app.use("/api/topics", topicRoutes);
 app.use("/api/notes", noteRoutes);
 app.use("/api/ai", require("./routes/aiRoutes"));
 app.use("/api/materials", materialRoutes);
+app.use("/api/conversations", conversationRoutes);
 
 app.use((err, req, res, next) => {
   console.error("SERVER ERROR:", err);
