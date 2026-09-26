@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
-import Navbar from '../components/Navbar';
 import './AISolver.css';
 import MermaidDiagram from '../components/MermaidDiagram';
 import Sidebar from '../components/Sidebar';
@@ -148,7 +147,6 @@ function AISolver() {
         refreshTrigger={refreshTrigger}
       />
       <div style={{ flex: 1 }}>
-        <Navbar />
         <div className="page-container">
           <h1>AI Solver</h1>
           <div className="card solver-form">
