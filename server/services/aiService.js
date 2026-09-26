@@ -8,11 +8,11 @@ function getStructureGuide(marks) {
 - "definition": the direct definition/answer (this should carry most of the marks)
 - "explanation": 1-2 sentences of supporting detail
 - "examples": an array of 1-2 short real-world examples or applications, ONLY if relevant — otherwise null
-Do NOT include introduction, diagram, advantages, disadvantages, applications, examples, or conclusion for this mark value.`;
+Do NOT include introduction, diagram, advantages, disadvantages, applications, types, or conclusion for this mark value.`;
   } else if (marks <= 5) {
     return `For a ${marks}-mark question, include:
 - "definition": the core concept/definition
-- "diagram": a short text description of a relevant diagram or flowchart, ONLY if this topic genuinely has a visual/process structure — otherwise use null
+- "diagram": ONLY if this topic genuinely has a visual/process structure that benefits from a flowchart or block diagram, provide valid Mermaid.js syntax (e.g. "flowchart TD\\nA[Input] --> B[Process] --> C[Output]") as a plain string — otherwise use null. Do NOT include explanations, backticks, or the word "mermaid" — just the raw Mermaid syntax.
 - "types": an array of types, ONLY if genuinely applicable - otherwise null
 - "explanation": the key points or working pipeline, as a short paragraph
 - "examples": an array of 1-2 short real-world examples or applications, ONLY if relevant — otherwise null
@@ -20,7 +20,7 @@ Do NOT include introduction, advantages, disadvantages, or conclusion for this m
 } else {
   return `For a ${marks}-mark question, include a full structured answer:
   - "introduction": 1-2 sentences introducing the topic
-  - "diagram": a short text description of a relevant block diagram/flowchart, ONLY if the topic genuinely has a visual structure — otherwise null
+  - "diagram": ONLY if the topic genuinely has a visual structure that benefits from a flowchart or block diagram, provide valid Mermaid.js syntax (e.g. "flowchart TD\\nA[Input] --> B[Process] --> C[Output]") as a plain string — otherwise use null. Do NOT include explanations, backticks, or the word "mermaid" — just the raw Mermaid syntax.
   - "explanation": the main working/explanation in detail (this should be the largest section)
   - "types": an array of types, ONLY if genuinely applicable - otherwise null
   - "advantages": an array of advantage strings, ONLY if genuinely applicable — otherwise null
@@ -42,7 +42,7 @@ Marks: ${marks}
 
 ${getStructureGuide(marks)}
 
-Respond with ONLY a valid JSON object (no markdown code fences, no extra text before or after) using exactly these possible keys: "introduction", "definition", "diagram", "explanation", "advantages", "disadvantages", "applications", "examples", "conclusion". Only include the keys relevant to this mark value as described above; omit or set null any key that doesn't apply. "advantages", "disadvantages", "applications", and "examples" should be arrays of short strings when included. All other fields should be plain strings.`;
+Respond with ONLY a valid JSON object (no markdown code fences, no extra text before or after) using exactly these possible keys: "introduction", "definition", "diagram", "explanation", "types", "advantages", "disadvantages", "applications", "examples", "conclusion". Only include the keys relevant to this mark value as described above; omit or set null any key that doesn't apply. "advantages", "disadvantages", "applications", "types", and "examples" should be arrays of short strings when included. The "diagram" field, when included, must be raw Mermaid.js syntax only (no backticks, no "mermaid" label, no explanation text). All other fields should be plain strings.`;
 
   const result = await model.generateContent(prompt);
   const rawText = result.response.text();

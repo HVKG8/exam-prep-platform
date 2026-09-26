@@ -2,6 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import './AISolver.css';
+import MermaidDiagram from '../components/MermaidDiagram';
 
 // Turns a camelCase key like "advantages" into a readable label "Advantages"
 function formatLabel(key) {
@@ -10,6 +11,15 @@ function formatLabel(key) {
 
 function AnswerSection({ label, value }) {
   if (value === null || value === undefined || value === '') return null;
+
+  if (label === 'diagram') {
+    return (
+      <div className="answer-section">
+        <h4>{formatLabel(label)}</h4>
+        <MermaidDiagram chart={value} />
+      </div>
+    );
+  }
 
   return (
     <div className="answer-section">

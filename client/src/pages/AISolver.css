@@ -54,3 +54,10 @@
 .answer-section ul li {
   margin-bottom: var(--space-xs);
 }
+
+.mermaid-diagram {
+  overflow-x: auto;
+  background: #fff;
+  border-radius: var(--radius);
+  padding: var(--space-md);
+}
