@@ -3,16 +3,40 @@ import axios from 'axios';
 import Navbar from '../components/Navbar';
 import './AISolver.css';
 
+// Turns a camelCase key like "advantages" into a readable label "Advantages"
+function formatLabel(key) {
+  return key.charAt(0).toUpperCase() + key.slice(1);
+}
+
+function AnswerSection({ label, value }) {
+  if (value === null || value === undefined || value === '') return null;
+
+  return (
+    <div className="answer-section">
+      <h4>{formatLabel(label)}</h4>
+      {Array.isArray(value) ? (
+        <ul>
+          {value.map((item, i) => (
+            <li key={i}>{item}</li>
+          ))}
+        </ul>
+      ) : (
+        <p>{value}</p>
+      )}
+    </div>
+  );
+}
+
 function AISolver() {
   const [question, setQuestion] = useState('');
   const [marks, setMarks] = useState('');
-  const [answer, setAnswer] = useState('');
+  const [answer, setAnswer] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setAnswer('');
+    setAnswer(null);
 
     try {
       const token = localStorage.getItem('token');
@@ -24,7 +48,7 @@ function AISolver() {
       setAnswer(res.data.answer);
     } catch (err) {
       console.error(err);
-      setAnswer('Something went wrong. Please try again.');
+      setAnswer({ explanation: 'Something went wrong. Please try again.' });
     } finally {
       setLoading(false);
     }
@@ -63,8 +87,9 @@ function AISolver() {
 
         {answer && (
           <div className="card answer-box">
-            <h3>Answer</h3>
-            <p>{answer}</p>
+            {Object.entries(answer).map(([key, value]) => (
+              <AnswerSection key={key} label={key} value={value} />
+            ))}
           </div>
         )}
       </div>

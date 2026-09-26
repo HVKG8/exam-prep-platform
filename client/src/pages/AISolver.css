@@ -24,3 +24,33 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+
+.answer-section {
+  margin-bottom: var(--space-md);
+  text-align: left;
+}
+
+.answer-section:last-child {
+  margin-bottom: 0;
+}
+
+.answer-section h4 {
+  margin: 0 0 var(--space-xs);
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+}
+
+.answer-section p {
+  margin: 0;
+}
+
+.answer-section ul {
+  margin: 0;
+  padding-left: var(--space-lg);
+}
+
+.answer-section ul li {
+  margin-bottom: var(--space-xs);
+}

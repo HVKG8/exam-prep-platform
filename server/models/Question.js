@@ -16,7 +16,7 @@ const questionSchema = new mongoose.Schema(
       required: true,
     },
     answer: {
-      type: String,
+      type: mongoose.Schema.Types.Mixed,
       required: true,
     },
   },
