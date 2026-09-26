@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import Navbar from '../components/Navbar'
+import Sidebar from '../components/Sidebar'
 import './Dashboard.css'
 
 function Dashboard() {
@@ -23,8 +23,8 @@ function Dashboard() {
   }, [])
 
   if (error) return (
-    <div>
-      <Navbar />
+    <div className="app-layout">
+      <Sidebar />
       <div className="page-container">
         <p className="error-text">{error}</p>
       </div>
@@ -32,8 +32,8 @@ function Dashboard() {
   )
 
   if (!user) return (
-    <div>
-      <Navbar />
+    <div className="app-layout">
+      <Sidebar />
       <div className="page-container">
         <p>Loading...</p>
       </div>
@@ -41,8 +41,8 @@ function Dashboard() {
   )
 
   return (
-    <div>
-      <Navbar />
+    <div className="app-layout">
+      <Sidebar />
       <div className="page-container">
         <h1>Dashboard</h1>
         <div className="card welcome-card">

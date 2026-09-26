@@ -303,24 +303,33 @@
   flex-shrink: 0;
 }
 
-.sidebar-theme-toggle {
-  width: 100%;
-  appearance: none;
-  -webkit-appearance: none;
-  background-color: #0b1120;
-  border: 1px solid #1e293b;
-  border-radius: 8px;
-  color: #cbd5e1;
-  font-size: 13px;
-  font-weight: 500;
-  padding: 10px 12px;
-  cursor: pointer;
-  margin-bottom: 12px;
-  transition: background-color 0.15s ease;
+.sidebar-main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-.sidebar-theme-toggle:hover {
+.sidebar-theme-toggle-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  margin-bottom: 2px;
+}
+
+.sidebar-theme-toggle-item:hover {
   background-color: #1e293b;
+  color: #fff;
 }
 
 .sidebar-chat-rename-input {

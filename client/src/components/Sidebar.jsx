@@ -15,6 +15,8 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
   const location = useLocation();
   const navigate = useNavigate();
 
+  const isSolverPage = location.pathname === "/solver";
+
   const fetchConversations = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -28,8 +30,10 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
   };
 
   useEffect(() => {
-    fetchConversations();
-  }, [refreshTrigger]);
+    if (isSolverPage) {
+      fetchConversations();
+    }
+  }, [refreshTrigger, isSolverPage]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -129,7 +133,8 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
     }
   };
 
-  const toggleTheme = () => {
+  const toggleTheme = (e) => {
+    e.stopPropagation();
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
 
@@ -142,7 +147,6 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
     { to: "/dashboard", label: "Home", icon: "🏠" },
     { to: "/materials", label: "Material", icon: "📘" },
     { to: "/solver", label: "AI Tutor", icon: "🤖" },
-    { to: "/history", label: "History", icon: "🕓" },
   ];
 
   return (
@@ -151,87 +155,89 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
         🎓 ExamPrep <span>AI</span>
       </div>
 
-      <nav className="sidebar-nav">
-        {navLinks.map((link) => (
-          <Link
-            key={link.to}
-            to={link.to}
-            className={`sidebar-nav-link ${location.pathname === link.to ? "active" : ""}`}
-          >
-            <span>{link.icon}</span>
-            {link.label}
-          </Link>
-        ))}
-      </nav>
+      <div className="sidebar-main">
+        <nav className="sidebar-nav">
+          {navLinks.map((link) => (
+            <Link
+              key={link.to}
+              to={link.to}
+              className={`sidebar-nav-link ${location.pathname === link.to ? "active" : ""}`}
+            >
+              <span>{link.icon}</span>
+              {link.label}
+            </Link>
+          ))}
+        </nav>
 
-      <button className="sidebar-theme-toggle" onClick={toggleTheme}>
-        {theme === "light" ? "🌙 Dark Mode" : "☀️ Light Mode"}
-      </button>
+        {isSolverPage && (
+          <>
+            <hr className="sidebar-divider" />
 
-      <hr className="sidebar-divider" />
+            <button className="sidebar-new-chat-btn" onClick={handleNewChat}>
+              + New Chat
+            </button>
 
-      <button className="sidebar-new-chat-btn" onClick={handleNewChat}>
-        + New Chat
-      </button>
-
-      <ul className="sidebar-chat-list">
-        {conversations.map((conv) => (
-          <li
-            key={conv._id}
-            onClick={() => onSelectConversation(conv._id)}
-            className={`sidebar-chat-item ${conv._id === selectedConversationId ? "active" : ""}`}
-          >
-            {renamingId === conv._id ? (
-              <input
-                className="sidebar-chat-rename-input"
-                value={renameValue}
-                onChange={(e) => setRenameValue(e.target.value)}
-                onClick={(e) => e.stopPropagation()}
-                onKeyDown={handleRenameKeyDown}
-                onBlur={() => submitRename(conv._id)}
-                autoFocus
-              />
-            ) : (
-              <span className="sidebar-chat-title">{conv.title}</span>
-            )}
-
-            <div className="sidebar-chat-menu-wrapper">
-              <button
-                className="sidebar-chat-dots"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDeleteConfirmId(null);
-                  setOpenMenuId(openMenuId === conv._id ? null : conv._id);
-                }}
-              >
-                ⋮
-              </button>
-              {openMenuId === conv._id && (
-                <div className="sidebar-chat-dropdown" onClick={(e) => e.stopPropagation()}>
-                  {deleteConfirmId === conv._id ? (
-                    <>
-                      <span className="sidebar-chat-confirm-text">Delete this chat?</span>
-                      <button onClick={(e) => handleConfirmDelete(e, conv._id)}>
-                        Confirm
-                      </button>
-                      <button onClick={() => setDeleteConfirmId(null)}>Cancel</button>
-                    </>
+            <ul className="sidebar-chat-list">
+              {conversations.map((conv) => (
+                <li
+                  key={conv._id}
+                  onClick={() => onSelectConversation(conv._id)}
+                  className={`sidebar-chat-item ${conv._id === selectedConversationId ? "active" : ""}`}
+                >
+                  {renamingId === conv._id ? (
+                    <input
+                      className="sidebar-chat-rename-input"
+                      value={renameValue}
+                      onChange={(e) => setRenameValue(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyDown={handleRenameKeyDown}
+                      onBlur={() => submitRename(conv._id)}
+                      autoFocus
+                    />
                   ) : (
-                    <>
-                      <button onClick={(e) => startRename(e, conv._id, conv.title)}>
-                        ✏ Rename
-                      </button>
-                      <button onClick={() => setDeleteConfirmId(conv._id)}>
-                        🗑 Delete
-                      </button>
-                    </>
+                    <span className="sidebar-chat-title">{conv.title}</span>
                   )}
-                </div>
-              )}
-            </div>
-          </li>
-        ))}
-      </ul>
+
+                  <div className="sidebar-chat-menu-wrapper">
+                    <button
+                      className="sidebar-chat-dots"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteConfirmId(null);
+                        setOpenMenuId(openMenuId === conv._id ? null : conv._id);
+                      }}
+                    >
+                      ⋮
+                    </button>
+                    {openMenuId === conv._id && (
+                      <div className="sidebar-chat-dropdown" onClick={(e) => e.stopPropagation()}>
+                        {deleteConfirmId === conv._id ? (
+                          <>
+                            <span className="sidebar-chat-confirm-text">Delete this chat?</span>
+                            <button onClick={(e) => handleConfirmDelete(e, conv._id)}>
+                              Confirm
+                            </button>
+                            <button onClick={() => setDeleteConfirmId(null)}>Cancel</button>
+                          </>
+                        ) : (
+                          <>
+                            <button onClick={(e) => startRename(e, conv._id, conv.title)}>
+                              ✏ Rename
+                            </button>
+                            <button onClick={() => setDeleteConfirmId(conv._id)}>
+                              🗑 Delete
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </div>
 
       {user && (
         <div className="sidebar-profile-wrapper">
@@ -240,6 +246,9 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
               <p className="sidebar-profile-role-line">
                 Role: <span>{user.role}</span>
               </p>
+              <button className="sidebar-theme-toggle-item" onClick={toggleTheme}>
+                {theme === "light" ? "🌙 Dark Mode" : "☀️ Light Mode"}
+              </button>
               <button onClick={handleLogout} className="sidebar-logout-btn">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />

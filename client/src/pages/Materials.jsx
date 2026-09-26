@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import Navbar from '../components/Navbar';
+import Sidebar from '../components/Sidebar';
 import './Materials.css';
 
 function Materials() {
@@ -147,8 +147,8 @@ function Materials() {
   };
 
   return (
-    <div>
-      <Navbar />
+    <div className="app-layout">
+      <Sidebar />
       <div className="page-container">
         <h1>Study Materials</h1>
 

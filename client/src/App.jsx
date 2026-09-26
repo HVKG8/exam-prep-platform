@@ -5,7 +5,6 @@ import Dashboard from './pages/Dashboard'
 import ProtectedRoute from './components/ProtectedRoute'
 import AISolver from './pages/AISolver';
 import Materials from './pages/Materials';
-import History from './pages/History';
 
 function App() {
   return (
@@ -23,7 +22,6 @@ function App() {
         />
         <Route path="/solver" element={<ProtectedRoute><AISolver /></ProtectedRoute>} />
         <Route path="/materials" element={<ProtectedRoute><Materials /></ProtectedRoute>} />
-        <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   )

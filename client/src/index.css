@@ -95,6 +95,11 @@ p {
   margin-bottom: var(--space-lg);
 }
 
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
 :root.dark {
   --color-primary: #6366f1;
   --color-primary-hover: #4f46e5;
