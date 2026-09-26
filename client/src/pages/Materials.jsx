@@ -73,6 +73,17 @@ function Materials() {
     }
   };
 
+  const typeOptions = [
+  { value: '', label: 'All Types', icon: '📁' },
+  { value: 'notes', label: 'Notes', icon: '📝' },
+  { value: 'book', label: 'Book', icon: '📕' },
+  { value: 'assignment', label: 'Assignment', icon: '🗂️' },
+  { value: 'question-paper', label: 'Question Paper', icon: '📄' },
+  { value: 'diagram', label: 'Diagram', icon: '🖼️' },
+  { value: 'syllabus', label: 'Syllabus', icon: '📋' },
+  { value: 'revision', label: 'Revision', icon: '⚡' },
+];
+
   useEffect(() => {
     fetchUser();
     fetchSubjects();
@@ -85,6 +96,13 @@ function Materials() {
   };
 
   const handleFilterChange = () => {
+    setSearchTerm('');
+    fetchMaterials();
+  };
+
+  // NEW: clicking a subject in the left panel sets the filter and refetches
+  const handleSubjectClick = (subjectId) => {
+    setSubjectFilter(subjectId);
     setSearchTerm('');
     fetchMaterials();
   };
@@ -148,126 +166,149 @@ function Materials() {
     }
   };
 
+  const getTypeIcon = (type) => {
+  const icons = {
+    notes: '📝',
+    book: '📕',
+    assignment: '🗂️',
+    'question-paper': '📄',
+    diagram: '🖼️',
+    syllabus: '📋',
+    revision: '⚡',
+  };
+  return icons[type] || '📁';
+};
+
   return (
     <div className="app-layout">
       <Sidebar />
       <div className="page-container">
         <h1>Study Materials</h1>
 
-        <div className="materials-toolbar">
-          <form onSubmit={handleSearch} className="search-form">
-            <input
-              type="text"
-              className="input"
-              placeholder="Search by title..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <button type="submit" className="btn">Search</button>
-          </form>
-
-          <select
-            className="filter-select"
-            value={subjectFilter}
-            onChange={(e) => {
-              setSubjectFilter(e.target.value);
-              handleFilterChange();
-            }}
-          >
-            <option value="">All Subjects</option>
+        <div className="materials-body">
+          {/* LEFT PANEL: Subjects */}
+          <div className="materials-subjects-panel">
+            <button
+              className={`subject-nav-item ${subjectFilter === '' ? 'active' : ''}`}
+              onClick={() => handleSubjectClick('')}
+            >
+              All Subjects
+            </button>
             {subjects.map((s) => (
-              <option key={s._id} value={s._id}>
+              <button
+                key={s._id}
+                className={`subject-nav-item ${subjectFilter === s._id ? 'active' : ''}`}
+                onClick={() => handleSubjectClick(s._id)}
+              >
                 {s.name}
-              </option>
-            ))}
-          </select>
-
-          <select
-            className="filter-select"
-            value={typeFilter}
-            onChange={(e) => {
-              setTypeFilter(e.target.value);
-              handleFilterChange();
-            }}
-          >
-            <option value="">All Types</option>
-            <option value="notes">Notes</option>
-            <option value="book">Book</option>
-            <option value="assignment">Assignment</option>
-            <option value="question-paper">Question Paper</option>
-            <option value="diagram">Diagram</option>
-          </select>
-        </div>
-
-        {loading && <p>Loading...</p>}
-        {error && <p className="error-text">{error}</p>}
-        {!loading && !error && materials.length === 0 && <p>No materials found.</p>}
-
-        <ul className="materials-list">
-          {materials.map((m) => (
-            <li key={m._id} className="material-item">
-              <span>
-                <strong>{m.title}</strong>
-                <span className="material-type">— {m.type} ({m.subject?.name})</span>
-              </span>
-              <div className="material-actions">
-                <button onClick={() => handleDownload(m._id)} className="btn-outline">
-                  Download
-                </button>
-                {(userRole === 'teacher' || userRole === 'admin') && (
-                  <button onClick={() => handleDelete(m._id)} className="btn-danger">
-                    Delete
-                  </button>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-
-        {(userRole === 'teacher' || userRole === 'admin') && (
-          <div className="card upload-section">
-            <h3>Upload Material</h3>
-            <form onSubmit={handleUpload} className="upload-form">
-              <input
-                type="text"
-                className="input"
-                placeholder="Title"
-                value={uploadTitle}
-                onChange={(e) => setUploadTitle(e.target.value)}
-              />
-              <select
-                className="input"
-                value={uploadType}
-                onChange={(e) => setUploadType(e.target.value)}
-              >
-                <option value="notes">Notes</option>
-                <option value="book">Book</option>
-                <option value="assignment">Assignment</option>
-                <option value="question-paper">Question Paper</option>
-                <option value="diagram">Diagram</option>
-                <option value="syllabus">Syllabus</option>
-                <option value="revision">Quick Revision</option>
-              </select>
-              <select
-                className="input"
-                value={uploadSubject}
-                onChange={(e) => setUploadSubject(e.target.value)}
-              >
-                <option value="">Select Subject</option>
-                {subjects.map((s) => (
-                  <option key={s._id} value={s._id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-              <input type="file" onChange={(e) => setUploadFile(e.target.files[0])} />
-              <button type="submit" className="btn" disabled={uploading}>
-                {uploading ? 'Uploading...' : 'Upload'}
               </button>
-            </form>
-            {uploadMessage && <p className="upload-message">{uploadMessage}</p>}
+            ))}
           </div>
+
+          {/* RIGHT PANEL: everything else, unchanged for now */}
+          <div className="materials-main-panel">
+            <div className="materials-toolbar">
+              <form onSubmit={handleSearch} className="search-form">
+  <span className="search-icon">🔍</span>
+  <input
+    type="text"
+    className="search-input"
+    placeholder="Search materials by title..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+  />
+  <button type="submit" className="btn search-btn">Search</button>
+</form>
+
+              <div className="type-tabs">
+  {typeOptions.map((opt) => (
+    <button
+      key={opt.value}
+      className={`type-tab ${typeFilter === opt.value ? 'active' : ''}`}
+      onClick={() => {
+        setTypeFilter(opt.value);
+        handleFilterChange();
+      }}
+    >
+      {opt.icon} {opt.label}
+    </button>
+  ))}
+</div>
+            </div>
+
+            {loading && <p>Loading...</p>}
+            {error && <p className="error-text">{error}</p>}
+            {!loading && !error && materials.length === 0 && <p>No materials found.</p>}
+
+            <div className="materials-grid">
+  {materials.map((m) => (
+    <div key={m._id} className="material-card">
+      <div className="material-card-icon">{getTypeIcon(m.type)}</div>
+      <div className="material-card-body">
+        <h4 className="material-card-title">{m.title}</h4>
+        <p className="material-card-subject">{m.subject?.name}</p>
+        <span className="material-card-badge">{m.type}</span>
+      </div>
+      <div className="material-card-actions">
+        <button onClick={() => handleDownload(m._id)} className="btn-outline">
+          Download
+        </button>
+        {(userRole === 'teacher' || userRole === 'admin') && (
+          <button onClick={() => handleDelete(m._id)} className="btn-danger">
+            Delete
+          </button>
         )}
+      </div>
+    </div>
+  ))}
+</div>
+
+            {(userRole === 'teacher' || userRole === 'admin') && (
+              <div className="card upload-section">
+                <h3>Upload Material</h3>
+                <form onSubmit={handleUpload} className="upload-form">
+                  <input
+                    type="text"
+                    className="input"
+                    placeholder="Title"
+                    value={uploadTitle}
+                    onChange={(e) => setUploadTitle(e.target.value)}
+                  />
+                  <select
+                    className="input"
+                    value={uploadType}
+                    onChange={(e) => setUploadType(e.target.value)}
+                  >
+                    <option value="notes">Notes</option>
+                    <option value="book">Book</option>
+                    <option value="assignment">Assignment</option>
+                    <option value="question-paper">Question Paper</option>
+                    <option value="diagram">Diagram</option>
+                    <option value="syllabus">Syllabus</option>
+                    <option value="revision">Quick Revision</option>
+                  </select>
+                  <select
+                    className="input"
+                    value={uploadSubject}
+                    onChange={(e) => setUploadSubject(e.target.value)}
+                  >
+                    <option value="">Select Subject</option>
+                    {subjects.map((s) => (
+                      <option key={s._id} value={s._id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                  <input type="file" onChange={(e) => setUploadFile(e.target.files[0])} />
+                  <button type="submit" className="btn" disabled={uploading}>
+                    {uploading ? 'Uploading...' : 'Upload'}
+                  </button>
+                </form>
+                {uploadMessage && <p className="upload-message">{uploadMessage}</p>}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
