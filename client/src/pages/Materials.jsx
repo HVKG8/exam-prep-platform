@@ -14,6 +14,9 @@ function Materials() {
   const [subjectFilter, setSubjectFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [userRole, setUserRole] = useState('');
+  const [newSubjectName, setNewSubjectName] = useState('');
+  const [subjectMessage, setSubjectMessage] = useState('');
+  const [addingSubject, setAddingSubject] = useState(false);
 
   const [uploadTitle, setUploadTitle] = useState('');
   const [uploadType, setUploadType] = useState('notes');
@@ -21,6 +24,17 @@ function Materials() {
   const [uploadFile, setUploadFile] = useState(null);
   const [uploadMessage, setUploadMessage] = useState('');
   const [uploading, setUploading] = useState(false);
+
+  const typeOptions = [
+    { value: '', label: 'All Types', icon: '📁' },
+    { value: 'notes', label: 'Notes', icon: '📝' },
+    { value: 'book', label: 'Book', icon: '📕' },
+    { value: 'assignment', label: 'Assignment', icon: '🗂️' },
+    { value: 'question-paper', label: 'Question Paper', icon: '📄' },
+    { value: 'diagram', label: 'Diagram', icon: '🖼️' },
+    { value: 'syllabus', label: 'Syllabus', icon: '📋' },
+    { value: 'revision', label: 'Revision', icon: '⚡' },
+  ];
 
   const fetchUser = async () => {
     try {
@@ -73,17 +87,6 @@ function Materials() {
     }
   };
 
-  const typeOptions = [
-  { value: '', label: 'All Types', icon: '📁' },
-  { value: 'notes', label: 'Notes', icon: '📝' },
-  { value: 'book', label: 'Book', icon: '📕' },
-  { value: 'assignment', label: 'Assignment', icon: '🗂️' },
-  { value: 'question-paper', label: 'Question Paper', icon: '📄' },
-  { value: 'diagram', label: 'Diagram', icon: '🖼️' },
-  { value: 'syllabus', label: 'Syllabus', icon: '📋' },
-  { value: 'revision', label: 'Revision', icon: '⚡' },
-];
-
   useEffect(() => {
     fetchUser();
     fetchSubjects();
@@ -100,11 +103,37 @@ function Materials() {
     fetchMaterials();
   };
 
-  // NEW: clicking a subject in the left panel sets the filter and refetches
   const handleSubjectClick = (subjectId) => {
     setSubjectFilter(subjectId);
     setSearchTerm('');
     fetchMaterials();
+  };
+
+  const handleAddSubject = async (e) => {
+    e.preventDefault();
+    if (!newSubjectName.trim()) {
+      setSubjectMessage('Please enter a subject name.');
+      return;
+    }
+
+    setAddingSubject(true);
+    setSubjectMessage('');
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(
+        'http://localhost:5000/api/subjects',
+        { name: newSubjectName.trim(), semester: 7 },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setNewSubjectName('');
+      setSubjectMessage('Subject added!');
+      fetchSubjects();
+    } catch (err) {
+      setSubjectMessage(err.response?.data?.message || 'Failed to add subject.');
+    } finally {
+      setAddingSubject(false);
+    }
   };
 
   const handleDownload = (id) => {
@@ -167,17 +196,17 @@ function Materials() {
   };
 
   const getTypeIcon = (type) => {
-  const icons = {
-    notes: '📝',
-    book: '📕',
-    assignment: '🗂️',
-    'question-paper': '📄',
-    diagram: '🖼️',
-    syllabus: '📋',
-    revision: '⚡',
+    const icons = {
+      notes: '📝',
+      book: '📕',
+      assignment: '🗂️',
+      'question-paper': '📄',
+      diagram: '🖼️',
+      syllabus: '📋',
+      revision: '⚡',
+    };
+    return icons[type] || '📁';
   };
-  return icons[type] || '📁';
-};
 
   return (
     <div className="app-layout">
@@ -203,37 +232,53 @@ function Materials() {
                 {s.name}
               </button>
             ))}
+
+            {(userRole === 'teacher' || userRole === 'admin') && (
+              <form onSubmit={handleAddSubject} className="add-subject-form">
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="New subject name"
+                  value={newSubjectName}
+                  onChange={(e) => setNewSubjectName(e.target.value)}
+                />
+                <button type="submit" className="btn-outline" disabled={addingSubject}>
+                  {addingSubject ? 'Adding...' : '+ Add Subject'}
+                </button>
+                {subjectMessage && <p className="subject-message">{subjectMessage}</p>}
+              </form>
+            )}
           </div>
 
-          {/* RIGHT PANEL: everything else, unchanged for now */}
+          {/* RIGHT PANEL */}
           <div className="materials-main-panel">
             <div className="materials-toolbar">
               <form onSubmit={handleSearch} className="search-form">
-  <span className="search-icon">🔍</span>
-  <input
-    type="text"
-    className="search-input"
-    placeholder="Search materials by title..."
-    value={searchTerm}
-    onChange={(e) => setSearchTerm(e.target.value)}
-  />
-  <button type="submit" className="btn search-btn">Search</button>
-</form>
+                <span className="search-icon">🔍</span>
+                <input
+                  type="text"
+                  className="search-input"
+                  placeholder="Search materials by title..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <button type="submit" className="btn search-btn">Search</button>
+              </form>
 
               <div className="type-tabs">
-  {typeOptions.map((opt) => (
-    <button
-      key={opt.value}
-      className={`type-tab ${typeFilter === opt.value ? 'active' : ''}`}
-      onClick={() => {
-        setTypeFilter(opt.value);
-        handleFilterChange();
-      }}
-    >
-      {opt.icon} {opt.label}
-    </button>
-  ))}
-</div>
+                {typeOptions.map((opt) => (
+                  <button
+                    key={opt.value}
+                    className={`type-tab ${typeFilter === opt.value ? 'active' : ''}`}
+                    onClick={() => {
+                      setTypeFilter(opt.value);
+                      handleFilterChange();
+                    }}
+                  >
+                    {opt.icon} {opt.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {loading && <p>Loading...</p>}
@@ -241,27 +286,27 @@ function Materials() {
             {!loading && !error && materials.length === 0 && <p>No materials found.</p>}
 
             <div className="materials-grid">
-  {materials.map((m) => (
-    <div key={m._id} className="material-card">
-      <div className="material-card-icon">{getTypeIcon(m.type)}</div>
-      <div className="material-card-body">
-        <h4 className="material-card-title">{m.title}</h4>
-        <p className="material-card-subject">{m.subject?.name}</p>
-        <span className="material-card-badge">{m.type}</span>
-      </div>
-      <div className="material-card-actions">
-        <button onClick={() => handleDownload(m._id)} className="btn-outline">
-          Download
-        </button>
-        {(userRole === 'teacher' || userRole === 'admin') && (
-          <button onClick={() => handleDelete(m._id)} className="btn-danger">
-            Delete
-          </button>
-        )}
-      </div>
-    </div>
-  ))}
-</div>
+              {materials.map((m) => (
+                <div key={m._id} className="material-card">
+                  <div className="material-card-icon">{getTypeIcon(m.type)}</div>
+                  <div className="material-card-body">
+                    <h4 className="material-card-title">{m.title}</h4>
+                    <p className="material-card-subject">{m.subject?.name}</p>
+                    <span className="material-card-badge">{m.type}</span>
+                  </div>
+                  <div className="material-card-actions">
+                    <button onClick={() => handleDownload(m._id)} className="btn-outline">
+                      Download
+                    </button>
+                    {(userRole === 'teacher' || userRole === 'admin') && (
+                      <button onClick={() => handleDelete(m._id)} className="btn-danger">
+                        Delete
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
 
             {(userRole === 'teacher' || userRole === 'admin') && (
               <div className="card upload-section">
