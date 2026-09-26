@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import Sidebar from '../components/Sidebar';
 import './Materials.css';
 
 function Materials() {
+  const [searchParams] = useSearchParams();
   const [materials, setMaterials] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [error, setError] = useState('');
@@ -243,6 +245,8 @@ function Materials() {
                 <option value="assignment">Assignment</option>
                 <option value="question-paper">Question Paper</option>
                 <option value="diagram">Diagram</option>
+                <option value="syllabus">Syllabus</option>
+                <option value="revision">Quick Revision</option>
               </select>
               <select
                 className="input"

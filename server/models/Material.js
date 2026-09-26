@@ -5,7 +5,7 @@ const materialSchema = new mongoose.Schema(
     title: { type: String, required: true },
     type: {
       type: String,
-      enum: ["notes", "book", "assignment", "question-paper", "diagram"],
+      enum: ["notes", "book", "assignment", "question-paper", "diagram", "syllabus", "revision"],
       required: true,
     },
     subject: {
