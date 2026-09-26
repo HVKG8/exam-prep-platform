@@ -76,4 +76,49 @@ router.get("/:id", protect, async (req, res) => {
   }
 });
 
+
+// DELETE /api/conversations/:id - delete a conversation
+router.delete("/:id", protect, async (req, res) => {
+  try {
+    const conversation = await Conversation.findOneAndDelete({
+      _id: req.params.id,
+      student: req.user._id,
+    });
+
+    if (!conversation) {
+      return res.status(404).json({ message: "Conversation not found" });
+    }
+
+    res.status(200).json({ message: "Conversation deleted" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error deleting conversation" });
+  }
+});
+
+// PATCH /api/conversations/:id - rename a conversation
+router.patch("/:id", protect, async (req, res) => {
+  try {
+    const { title } = req.body;
+    if (!title || !title.trim()) {
+      return res.status(400).json({ message: "Title is required" });
+    }
+
+    const conversation = await Conversation.findOneAndUpdate(
+      { _id: req.params.id, student: req.user._id },
+      { title: title.trim() },
+      { new: true }
+    );
+
+    if (!conversation) {
+      return res.status(404).json({ message: "Conversation not found" });
+    }
+
+    res.status(200).json(conversation);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error renaming conversation" });
+  }
+});
+
 module.exports = router;

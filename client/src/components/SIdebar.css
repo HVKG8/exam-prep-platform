@@ -87,17 +87,101 @@
   margin: 0;
   overflow-y: auto;
   flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.sidebar-chat-list:hover {
+  scrollbar-color: #334155 transparent;
+}
+
+.sidebar-chat-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-chat-list::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 4px;
+}
+
+.sidebar-chat-list:hover::-webkit-scrollbar-thumb {
+  background-color: #334155;
 }
 
 .sidebar-chat-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   padding: 10px 12px;
   border-radius: 8px;
   font-size: 13px;
   color: #94a3b8;
   cursor: pointer;
+}
+
+.sidebar-chat-title {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex: 1;
+}
+
+.sidebar-chat-menu-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.sidebar-chat-dots {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-chat-item:hover .sidebar-chat-dots,
+.sidebar-chat-menu-wrapper:has(.sidebar-chat-dropdown) .sidebar-chat-dots {
+  opacity: 1;
+}
+
+.sidebar-chat-dots:hover {
+  background-color: #334155;
+  color: #fff;
+}
+
+.sidebar-chat-dropdown {
+  position: absolute;
+  right: 0;
+  top: 28px;
+  background-color: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  min-width: 130px;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.sidebar-chat-dropdown button {
+  background: none;
+  border: none;
+  color: #e2e8f0;
+  font-size: 13px;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.sidebar-chat-dropdown button:hover {
+  background-color: #334155;
 }
 
 .sidebar-chat-item:hover {
@@ -189,4 +273,30 @@
 
 .sidebar-theme-toggle:hover {
   background-color: #1e293b;
+}
+
+.sidebar-chat-rename-input {
+  flex: 1;
+  background-color: #1e293b;
+  border: 1px solid #6366f1;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 13px;
+  padding: 4px 8px;
+  outline: none;
+  min-width: 0;
+}
+
+.sidebar-chat-confirm-text {
+  font-size: 12px;
+  color: #cbd5e1;
+  padding: 6px 10px 2px;
+}
+
+.sidebar-chat-dropdown button:last-child {
+  color: #f87171;
+}
+
+.sidebar-chat-dropdown button:last-child:hover {
+  background-color: rgba(248, 113, 113, 0.15);
 }

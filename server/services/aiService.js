@@ -8,8 +8,8 @@ function getStructureGuide(marks) {
   } else if (marks <= 2) {
     return `For a ${marks}-mark question, keep it brief:
 - "definition": the direct definition/answer (this should carry most of the marks)
-- "explanation": 1-2 sentences of supporting detail
-- "examples": an array of 1-2 short real-world examples or applications, ONLY if relevant — otherwise null
+- "explanation": 1-3 sentences of supporting detail
+- "examples": an array of 1-3 short real-world examples or applications, ONLY if relevant — otherwise null
 Do NOT include introduction, diagram, advantages, disadvantages, applications, types, or conclusion for this mark value.`;
   } else if (marks <= 5) {
     return `For a ${marks}-mark question, include:
@@ -17,11 +17,11 @@ Do NOT include introduction, diagram, advantages, disadvantages, applications, t
 - "diagram": ONLY if this topic genuinely has a visual/process structure that benefits from a flowchart or block diagram, provide valid Mermaid.js syntax (e.g. "flowchart TD\\nA[Input] --> B[Process] --> C[Output]") as a plain string — otherwise use null. Do NOT include explanations, backticks, or the word "mermaid" — just the raw Mermaid syntax.
 - "types": an array of types, ONLY if genuinely applicable - otherwise null
 - "explanation": the key points or working pipeline, as a short paragraph
-- "examples": an array of 1-2 short real-world examples or applications, ONLY if relevant — otherwise null
+- "examples": an array of 1-3 short real-world examples or applications, ONLY if relevant — otherwise null
 Do NOT include introduction, advantages, disadvantages, or conclusion for this mark value.`;
 } else {
   return `For a ${marks}-mark question, include a full structured answer:
-  - "introduction": 1-2 sentences introducing the topic
+  - "introduction": 1-3 sentences introducing the topic
   - "diagram": ONLY if the topic genuinely has a visual structure that benefits from a flowchart or block diagram, provide valid Mermaid.js syntax (e.g. "flowchart TD\\nA[Input] --> B[Process] --> C[Output]") as a plain string — otherwise use null. Do NOT include explanations, backticks, or the word "mermaid" — just the raw Mermaid syntax.
   - "explanation": the main working/explanation in detail (this should be the largest section)
   - "types": an array of types, ONLY if genuinely applicable - otherwise null
@@ -29,7 +29,7 @@ Do NOT include introduction, advantages, disadvantages, or conclusion for this m
   - "disadvantages": an array of disadvantage strings, ONLY if genuinely applicable — otherwise null
   - "applications": an array of real-world application strings, ONLY if genuinely applicable — otherwise null
   - "conclusion": 1-2 sentences wrapping up
-  - "examples": an array of 1-2 short real-world examples or applications, ONLY if relevant — otherwise null
+  - "examples": an array of 1-3 short real-world examples or applications, ONLY if relevant — otherwise null
 Skip advantages/disadvantages/applications individually if the topic doesn't naturally have them (e.g. a purely mathematical or definitional topic) — never invent filler content just to fill a section.`;
   }
 }
