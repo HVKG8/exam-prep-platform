@@ -87,11 +87,16 @@ function Materials() {
     }
   };
 
+  // Runs once on mount — loads user + subjects only
   useEffect(() => {
     fetchUser();
     fetchSubjects();
-    fetchMaterials();
   }, []);
+
+  // Runs whenever subjectFilter or typeFilter changes — always uses the latest value
+  useEffect(() => {
+    fetchMaterials();
+  }, [subjectFilter, typeFilter]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -100,13 +105,11 @@ function Materials() {
 
   const handleFilterChange = () => {
     setSearchTerm('');
-    fetchMaterials();
   };
 
   const handleSubjectClick = (subjectId) => {
     setSubjectFilter(subjectId);
     setSearchTerm('');
-    fetchMaterials();
   };
 
   const handleAddSubject = async (e) => {
@@ -208,6 +211,8 @@ function Materials() {
     return icons[type] || '📁';
   };
 
+  const selectedSubjectName = subjects.find((s) => s._id === subjectFilter)?.name;
+
   return (
     <div className="app-layout">
       <Sidebar />
@@ -252,6 +257,19 @@ function Materials() {
 
           {/* RIGHT PANEL */}
           <div className="materials-main-panel">
+
+            {subjectFilter && selectedSubjectName && (
+              <div className="subject-hero">
+                <div className="subject-hero-icon">📘</div>
+                <div>
+                  <h2 className="subject-hero-title">{selectedSubjectName}</h2>
+                  <p className="subject-hero-subtitle">
+                    Access notes, papers, and study material for this subject.
+                  </p>
+                </div>
+              </div>
+            )}
+
             <div className="materials-toolbar">
               <form onSubmit={handleSearch} className="search-form">
                 <span className="search-icon">🔍</span>
