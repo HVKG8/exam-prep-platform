@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const messageSchema = new mongoose.Schema({
   question: { type: String, required: true },
-  marks: { type: Number, required: true },
+  marks: { type: Number, required: false },
   answer: { type: mongoose.Schema.Types.Mixed, required: true },
 }, { timestamps: true });
 

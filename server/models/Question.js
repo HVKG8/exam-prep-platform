@@ -13,7 +13,7 @@ const questionSchema = new mongoose.Schema(
     },
     marks: {
       type: Number,
-      required: true,
+      required: false,
     },
     answer: {
       type: mongoose.Schema.Types.Mixed,

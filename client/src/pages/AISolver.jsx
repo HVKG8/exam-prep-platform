@@ -20,13 +20,33 @@ function answerToPlainText(answer) {
     .join('\n\n');
 }
 
+function formatTime(dateStr) {
+  const date = dateStr ? new Date(dateStr) : new Date();
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+const sectionIcons = {
+  introduction: '📝',
+  definition: '📘',
+  explanation: '💡',
+  types: '🗂️',
+  advantages: '✅',
+  disadvantages: '⚠️',
+  applications: '🎯',
+  examples: '📄',
+  conclusion: '🏁',
+};
+
 function AnswerSection({ label, value }) {
   if (value === null || value === undefined || value === '') return null;
 
   if (label === 'diagram') {
     return (
       <div className="answer-section">
-        <h4>{formatLabel(label)}</h4>
+        <h4>
+          <span className="answer-section-icon">📊</span>
+          {formatLabel(label)}
+        </h4>
         <MermaidDiagram chart={value} />
       </div>
     );
@@ -34,7 +54,10 @@ function AnswerSection({ label, value }) {
 
   return (
     <div className="answer-section">
-      <h4>{formatLabel(label)}</h4>
+      <h4>
+        <span className="answer-section-icon">{sectionIcons[label] || '•'}</span>
+        {formatLabel(label)}
+      </h4>
       {Array.isArray(value) ? (
         <ul>
           {value.map((item, i) => (
@@ -57,6 +80,7 @@ function AISolver() {
   const [messages, setMessages] = useState([]);
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [regeneratingIndex, setRegeneratingIndex] = useState(null);
 
   useEffect(() => {
     const loadConversation = async () => {
@@ -113,7 +137,10 @@ function AISolver() {
       );
 
       // Step 4: show it immediately in the chat
-      setMessages([...messages, { question, marks, answer: newAnswer }]);
+      setMessages([
+        ...messages,
+        { question, marks, answer: newAnswer, createdAt: new Date().toISOString() },
+      ]);
       setQuestion('');
       setRefreshTrigger((prev) => prev + 1);
     } catch (err) {
@@ -122,6 +149,26 @@ function AISolver() {
       setLoading(false);
     }
   };
+
+  const handleRegenerate = async (index) => {
+  const msg = messages[index];
+  setRegeneratingIndex(index);
+  try {
+    const token = localStorage.getItem('token');
+    const res = await axios.post(
+      'http://localhost:5000/api/ai/solve',
+      { question: msg.question, marks: msg.marks },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    const updated = [...messages];
+    updated[index] = { ...updated[index], answer: res.data.answer };
+    setMessages(updated);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setRegeneratingIndex(null);
+  }
+};
 
   const handleCopy = (index, answerObj) => {
     navigator.clipboard.writeText(answerToPlainText(answerObj));
@@ -138,67 +185,104 @@ function AISolver() {
     }
   };
 
-  return (
+    return (
     <div style={{ display: 'flex' }}>
-            <Sidebar
+      <Sidebar
         selectedConversationId={selectedConversationId}
         onSelectConversation={setSelectedConversationId}
         onNewChat={() => setSelectedConversationId(null)}
         refreshTrigger={refreshTrigger}
       />
-      <div style={{ flex: 1 }}>
-        <div className="page-container">
-          <h1>AI Solver</h1>
-          <div className="card solver-form">
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label>Question</label>
-                <textarea
-                  ref={textareaRef}
-                  className="input"
-                  value={question}
-                  onChange={handleQuestionChange}
-                  rows={2}
-                />
-              </div>
-              <div className="form-group marks-group">
-                <label>Marks</label>
-                <input
-                  type="number"
-                  className="input"
-                  value={marks}
-                  onChange={(e) => setMarks(e.target.value)}
-                />
-              </div>
-              <button type="submit" className="btn" disabled={loading}>
-                {loading ? 'Solving...' : 'Get Answer'}
-              </button>
-            </form>
+      <div className="solver-page">
+        <div className="solver-header">
+          <div className="solver-header-left">
+            <div className="solver-bot-avatar">🤖</div>
+            <div>
+              <h1>AI Tutor</h1>
+              <p className="solver-subtitle">Your personal study assistant</p>
+            </div>
           </div>
+          <div className="solver-header-badge">✨ Ask · Learn · Excel</div>
+        </div>
 
+        <div className="solver-chat-scroll">
           {messages.length > 0 && (
             <div className="chat-thread">
               {messages.map((msg, index) => (
-                <div key={index}>
-                  <div className="chat-bubble user-bubble">
-                    <p>{msg.question}</p>
+                <div key={index} className="chat-message-group">
+                  <div className="chat-row user-row">
+                    <div className="chat-bubble user-bubble">
+                      <p>{msg.question}</p>
+                    </div>
+                    <div className="chat-avatar user-avatar">🧑</div>
                   </div>
-                  <div className="chat-bubble assistant-bubble">
-                    {Object.entries(msg.answer).map(([key, value]) => (
-                      <AnswerSection key={key} label={key} value={value} />
-                    ))}
-                    <button
-                      onClick={() => handleCopy(index, msg.answer)}
-                      className="btn-outline copy-btn"
-                    >
-                      {copiedIndex === index ? 'Copied!' : 'Copy'}
-                    </button>
+                  <p className="chat-timestamp user-timestamp">{formatTime(msg.createdAt)}</p>
+
+                  <div className="chat-row assistant-row">
+                    <div className="chat-avatar bot-avatar">🤖</div>
+                    <div className="chat-bubble assistant-bubble">
+                      {Object.entries(msg.answer).map(([key, value]) => (
+                        <AnswerSection key={key} label={key} value={value} />
+                      ))}
+                      <div className="assistant-bubble-footer">
+                        <button
+                          onClick={() => handleCopy(index, msg.answer)}
+                          className="footer-action-btn"
+                        >
+                          📋 {copiedIndex === index ? 'Copied!' : 'Copy'}
+                        </button>
+                        <button
+                          onClick={() => handleRegenerate(index)}
+                          className="footer-action-btn"
+                          disabled={regeneratingIndex === index}
+                        >
+                          🔄 {regeneratingIndex === index ? 'Regenerating...' : 'Regenerate'}
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           )}
         </div>
+
+        <form onSubmit={handleSubmit} className="solver-input-form">
+          <div className="marks-bar">
+            <span className="marks-bar-label">Marks:</span>
+            <div className="marks-chip-group">
+              {[2, 5, 10].map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  className={`marks-chip ${marks === m ? 'active' : ''}`}
+                  onClick={() => setMarks(marks === m ? '' : m)}
+                >
+                  {m}
+                </button>
+              ))}
+            </div>
+            <span className="marks-bar-hint">
+              {marks ? `Answer scaled for ${marks} marks` : 'AI will decide the depth'}
+            </span>
+          </div>
+
+          <div className="solver-input-bar">
+            <span className="input-bar-icon">📎</span>
+            <textarea
+              ref={textareaRef}
+              className="solver-input-textarea"
+              placeholder="Type your question here..."
+              value={question}
+              onChange={handleQuestionChange}
+              rows={1}
+            />
+            <span className="input-bar-icon">🎤</span>
+            <button type="submit" className="solver-send-btn" disabled={loading}>
+              {loading ? '…' : '➤'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

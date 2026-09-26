@@ -8,16 +8,16 @@ router.post("/solve", protect, async (req, res) => {
   try {
     const { question, marks } = req.body;
 
-    if (!question || !marks) {
-      return res.status(400).json({ message: "Question and marks are required" });
+    if (!question) {
+      return res.status(400).json({ message: "Question is required" });
     }
 
-    const answer = await askGemini(question, marks);
+    const answer = await askGemini(question, marks || null);
 
     const saved = await Question.create({
       student: req.user._id,
       question,
-      marks,
+      marks: marks || null,
       answer,
     });
 
