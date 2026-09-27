@@ -36,6 +36,16 @@ function Materials() {
     { value: 'revision', label: 'Revision', icon: '⚡' },
   ];
 
+  const quickAccessOptions = [
+  { value: 'notes', label: 'All Notes', icon: '📝' },
+  { value: 'book', label: 'All Books', icon: '📕' },
+  { value: 'assignment', label: 'All Assignments', icon: '🗂️' },
+  { value: 'question-paper', label: 'All Question Papers', icon: '📄' },
+  { value: 'diagram', label: 'All Diagrams', icon: '🖼️' },
+  { value: 'syllabus', label: 'All Syllabus', icon: '📋' },
+  { value: 'revision', label: 'All Revision', icon: '⚡' },
+];
+
   const fetchUser = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -216,7 +226,7 @@ function Materials() {
   return (
     <div className="app-layout">
       <Sidebar />
-      <div className="page-container">
+      <div className="page-container page-container-wide">
         <h1>Study Materials</h1>
 
         <div className="materials-body">
@@ -326,7 +336,7 @@ function Materials() {
               ))}
             </div>
 
-            {(userRole === 'teacher' || userRole === 'admin') && (
+                        {(userRole === 'teacher' || userRole === 'admin') && (
               <div className="card upload-section">
                 <h3>Upload Material</h3>
                 <form onSubmit={handleUpload} className="upload-form">
@@ -371,6 +381,25 @@ function Materials() {
               </div>
             )}
           </div>
+          {/* end materials-main-panel */}
+
+          {/* RIGHT SIDEBAR: Quick Access */}
+          <div className="materials-quick-access">
+            <h3 className="quick-access-title">Quick Access</h3>
+            {quickAccessOptions.map((opt) => (
+              <button
+                key={opt.value}
+                className={`quick-access-item ${typeFilter === opt.value ? 'active' : ''}`}
+                onClick={() => {
+                  setTypeFilter(opt.value);
+                  handleFilterChange();
+                }}
+              >
+                {opt.icon} {opt.label}
+              </button>
+            ))}
+          </div>
+          {/* end materials-body */}
         </div>
       </div>
     </div>
