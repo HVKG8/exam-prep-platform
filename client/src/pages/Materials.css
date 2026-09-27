@@ -291,3 +291,64 @@
 .page-container-wide {
   max-width: 1400px;
 }
+
+.add-topic-inline {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.add-topic-inline .input {
+  flex: 1;
+}
+
+.topic-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.topic-section {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.topic-section-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md);
+  background: var(--color-surface);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.topic-section-header:hover {
+  background: var(--color-bg);
+}
+
+.topic-section-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+.topic-chevron {
+  transition: transform 0.15s ease;
+}
+
+.topic-chevron.open {
+  transform: rotate(180deg);
+}
+
+.topic-section .materials-grid {
+  padding: var(--space-md);
+}

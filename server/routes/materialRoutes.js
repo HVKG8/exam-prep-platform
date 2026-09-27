@@ -43,6 +43,7 @@ router.get("/", protect, async (req, res) => {
 
     const materials = await Material.find(filter)
       .populate("subject", "name")
+      .populate("topic", "title")
       .sort({ createdAt: -1 });
 
     res.json(materials);
@@ -97,6 +98,7 @@ router.get("/search", protect, async (req, res) => {
       title: { $regex: query, $options: "i" },
     })
       .populate("subject", "name")
+      .populate("topic", "title")
       .sort({ createdAt: -1 });
 
     res.json(materials);

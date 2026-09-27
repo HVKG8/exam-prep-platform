@@ -17,6 +17,12 @@ function Materials() {
   const [newSubjectName, setNewSubjectName] = useState('');
   const [subjectMessage, setSubjectMessage] = useState('');
   const [addingSubject, setAddingSubject] = useState(false);
+  const [topics, setTopics] = useState([]);
+  const [uploadTopic, setUploadTopic] = useState('');
+  const [newTopicTitle, setNewTopicTitle] = useState('');
+  const [topicMessage, setTopicMessage] = useState('');
+  const [addingTopic, setAddingTopic] = useState(false);
+  const [expandedTopics, setExpandedTopics] = useState({});
 
   const [uploadTitle, setUploadTitle] = useState('');
   const [uploadType, setUploadType] = useState('notes');
@@ -37,14 +43,14 @@ function Materials() {
   ];
 
   const quickAccessOptions = [
-  { value: 'notes', label: 'All Notes', icon: '📝' },
-  { value: 'book', label: 'All Books', icon: '📕' },
-  { value: 'assignment', label: 'All Assignments', icon: '🗂️' },
-  { value: 'question-paper', label: 'All Question Papers', icon: '📄' },
-  { value: 'diagram', label: 'All Diagrams', icon: '🖼️' },
-  { value: 'syllabus', label: 'All Syllabus', icon: '📋' },
-  { value: 'revision', label: 'All Revision', icon: '⚡' },
-];
+    { value: 'notes', label: 'All Notes', icon: '📝' },
+    { value: 'book', label: 'All Books', icon: '📕' },
+    { value: 'assignment', label: 'All Assignments', icon: '🗂️' },
+    { value: 'question-paper', label: 'All Question Papers', icon: '📄' },
+    { value: 'diagram', label: 'All Diagrams', icon: '🖼️' },
+    { value: 'syllabus', label: 'All Syllabus', icon: '📋' },
+    { value: 'revision', label: 'All Revision', icon: '⚡' },
+  ];
 
   const fetchUser = async () => {
     try {
@@ -67,6 +73,18 @@ function Materials() {
       setSubjects(res.data);
     } catch (err) {
       console.error('Could not load subjects', err);
+    }
+  };
+
+  const fetchTopics = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get('http://localhost:5000/api/topics', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTopics(res.data);
+    } catch (err) {
+      console.error('Could not load topics', err);
     }
   };
 
@@ -97,13 +115,12 @@ function Materials() {
     }
   };
 
-  // Runs once on mount — loads user + subjects only
   useEffect(() => {
     fetchUser();
     fetchSubjects();
+    fetchTopics();
   }, []);
 
-  // Runs whenever subjectFilter or typeFilter changes — always uses the latest value
   useEffect(() => {
     fetchMaterials();
   }, [subjectFilter, typeFilter]);
@@ -149,6 +166,33 @@ function Materials() {
     }
   };
 
+  const handleAddTopic = async (e) => {
+    e.preventDefault();
+    if (!newTopicTitle.trim() || !uploadSubject) {
+      setTopicMessage('Select a subject above first, then enter a topic name.');
+      return;
+    }
+
+    setAddingTopic(true);
+    setTopicMessage('');
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(
+        'http://localhost:5000/api/topics',
+        { title: newTopicTitle.trim(), subject: uploadSubject },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setNewTopicTitle('');
+      setTopicMessage('Topic added!');
+      fetchTopics();
+    } catch (err) {
+      setTopicMessage(err.response?.data?.message || 'Failed to add topic.');
+    } finally {
+      setAddingTopic(false);
+    }
+  };
+
   const handleDownload = (id) => {
     const token = localStorage.getItem('token');
     window.open(`http://localhost:5000/api/materials/${id}/download?token=${token}`, '_blank');
@@ -186,6 +230,7 @@ function Materials() {
       formData.append('title', uploadTitle);
       formData.append('type', uploadType);
       formData.append('subject', uploadSubject);
+      if (uploadTopic) formData.append('topic', uploadTopic);
 
       await axios.post('http://localhost:5000/api/materials', formData, {
         headers: {
@@ -198,6 +243,7 @@ function Materials() {
       setUploadTitle('');
       setUploadType('notes');
       setUploadSubject('');
+      setUploadTopic('');
       setUploadFile(null);
       e.target.reset();
       fetchMaterials();
@@ -219,6 +265,23 @@ function Materials() {
       revision: '⚡',
     };
     return icons[type] || '📁';
+  };
+
+  const toggleTopic = (key) => {
+    setExpandedTopics((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const groupMaterialsByTopic = () => {
+    const groups = {};
+    materials.forEach((m) => {
+      const key = m.topic?._id || 'uncategorized';
+      const title = m.topic?.title || 'Uncategorized';
+      if (!groups[key]) groups[key] = { title, items: [] };
+      groups[key].items.push(m);
+    });
+    const entries = Object.entries(groups);
+    entries.sort((a, b) => (a[0] === 'uncategorized' ? 1 : b[0] === 'uncategorized' ? -1 : 0));
+    return entries;
   };
 
   const selectedSubjectName = subjects.find((s) => s._id === subjectFilter)?.name;
@@ -313,30 +376,76 @@ function Materials() {
             {error && <p className="error-text">{error}</p>}
             {!loading && !error && materials.length === 0 && <p>No materials found.</p>}
 
-            <div className="materials-grid">
-              {materials.map((m) => (
-                <div key={m._id} className="material-card">
-                  <div className="material-card-icon">{getTypeIcon(m.type)}</div>
-                  <div className="material-card-body">
-                    <h4 className="material-card-title">{m.title}</h4>
-                    <p className="material-card-subject">{m.subject?.name}</p>
-                    <span className="material-card-badge">{m.type}</span>
-                  </div>
-                  <div className="material-card-actions">
-                    <button onClick={() => handleDownload(m._id)} className="btn-outline">
-                      Download
-                    </button>
-                    {(userRole === 'teacher' || userRole === 'admin') && (
-                      <button onClick={() => handleDelete(m._id)} className="btn-danger">
-                        Delete
-                      </button>
-                    )}
-                  </div>
+            {!loading && !error && materials.length > 0 && (
+              subjectFilter ? (
+                <div className="topic-accordion">
+                  {groupMaterialsByTopic().map(([key, group], index) => {
+                    const isOpen =
+                      expandedTopics[key] !== undefined ? expandedTopics[key] : index === 0;
+                    return (
+                      <div key={key} className="topic-section">
+                        <button className="topic-section-header" onClick={() => toggleTopic(key)}>
+                          <span>{group.title}</span>
+                          <span className="topic-section-meta">
+                            {group.items.length} resource{group.items.length !== 1 ? 's' : ''}
+                            <span className={`topic-chevron ${isOpen ? 'open' : ''}`}>▾</span>
+                          </span>
+                        </button>
+                        {isOpen && (
+                          <div className="materials-grid">
+                            {group.items.map((m) => (
+                              <div key={m._id} className="material-card">
+                                <div className="material-card-icon">{getTypeIcon(m.type)}</div>
+                                <div className="material-card-body">
+                                  <h4 className="material-card-title">{m.title}</h4>
+                                  <p className="material-card-subject">{m.subject?.name}</p>
+                                  <span className="material-card-badge">{m.type}</span>
+                                </div>
+                                <div className="material-card-actions">
+                                  <button onClick={() => handleDownload(m._id)} className="btn-outline">
+                                    Download
+                                  </button>
+                                  {(userRole === 'teacher' || userRole === 'admin') && (
+                                    <button onClick={() => handleDelete(m._id)} className="btn-danger">
+                                      Delete
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-              ))}
-            </div>
-
+              ) : (
+                <div className="materials-grid">
+                  {materials.map((m) => (
+                    <div key={m._id} className="material-card">
+                      <div className="material-card-icon">{getTypeIcon(m.type)}</div>
+                      <div className="material-card-body">
+                        <h4 className="material-card-title">{m.title}</h4>
+                        <p className="material-card-subject">{m.subject?.name}</p>
+                        <span className="material-card-badge">{m.type}</span>
+                      </div>
+                      <div className="material-card-actions">
+                        <button onClick={() => handleDownload(m._id)} className="btn-outline">
+                          Download
+                        </button>
                         {(userRole === 'teacher' || userRole === 'admin') && (
+                          <button onClick={() => handleDelete(m._id)} className="btn-danger">
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )
+            )}
+
+            {(userRole === 'teacher' || userRole === 'admin') && (
               <div className="card upload-section">
                 <h3>Upload Material</h3>
                 <form onSubmit={handleUpload} className="upload-form">
@@ -363,7 +472,10 @@ function Materials() {
                   <select
                     className="input"
                     value={uploadSubject}
-                    onChange={(e) => setUploadSubject(e.target.value)}
+                    onChange={(e) => {
+                      setUploadSubject(e.target.value);
+                      setUploadTopic('');
+                    }}
                   >
                     <option value="">Select Subject</option>
                     {subjects.map((s) => (
@@ -372,6 +484,45 @@ function Materials() {
                       </option>
                     ))}
                   </select>
+
+                  {uploadSubject && (
+                    <>
+                      <select
+                        className="input"
+                        value={uploadTopic}
+                        onChange={(e) => setUploadTopic(e.target.value)}
+                      >
+                        <option value="">No Topic / Unit (optional)</option>
+                        {topics
+                          .filter((t) => t.subject?._id === uploadSubject)
+                          .map((t) => (
+                            <option key={t._id} value={t._id}>
+                              {t.title}
+                            </option>
+                          ))}
+                      </select>
+
+                      <div className="add-topic-inline">
+                        <input
+                          type="text"
+                          className="input"
+                          placeholder="New unit/topic name"
+                          value={newTopicTitle}
+                          onChange={(e) => setNewTopicTitle(e.target.value)}
+                        />
+                        <button
+                          type="button"
+                          className="btn-outline"
+                          onClick={handleAddTopic}
+                          disabled={addingTopic}
+                        >
+                          {addingTopic ? 'Adding...' : '+ Add'}
+                        </button>
+                      </div>
+                      {topicMessage && <p className="subject-message">{topicMessage}</p>}
+                    </>
+                  )}
+
                   <input type="file" onChange={(e) => setUploadFile(e.target.files[0])} />
                   <button type="submit" className="btn" disabled={uploading}>
                     {uploading ? 'Uploading...' : 'Upload'}
