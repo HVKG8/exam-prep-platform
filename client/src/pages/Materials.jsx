@@ -371,6 +371,23 @@ function Materials() {
                 ))}
               </div>
             </div>
+            <div className="subject-shortcut-bar">
+  <button
+    className={`subject-shortcut ${subjectFilter === '' ? 'active' : ''}`}
+    onClick={() => handleSubjectClick('')}
+  >
+    📚 All Subjects
+  </button>
+  {subjects.map((s) => (
+    <button
+      key={s._id}
+      className={`subject-shortcut ${subjectFilter === s._id ? 'active' : ''}`}
+      onClick={() => handleSubjectClick(s._id)}
+    >
+      {s.name}
+    </button>
+  ))}
+</div>
 
             {loading && <p>Loading...</p>}
             {error && <p className="error-text">{error}</p>}
