@@ -305,6 +305,7 @@
 
 .page-container-wide {
   max-width: 1400px;
+  overflow-x: hidden;
 }
 
 .add-topic-inline {
