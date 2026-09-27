@@ -290,7 +290,15 @@ function Materials() {
     <div className="app-layout">
       <Sidebar />
       <div className="page-container page-container-wide">
-        <h1>Study Materials</h1>
+        <div className="page-header">
+  <div className="page-header-icon">📖</div>
+  <div>
+    <h1 className="page-header-title">Study Materials</h1>
+    <p className="page-header-subtitle">
+      Access organized notes, papers, diagrams, and more for all your subjects.
+    </p>
+  </div>
+</div>
 
         <div className="materials-body">
           {/* LEFT PANEL: Subjects */}

@@ -389,3 +389,30 @@
   border-color: var(--color-primary);
   color: #fff;
 }
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.page-header-icon {
+  font-size: 32px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-sm) var(--space-md);
+  flex-shrink: 0;
+}
+
+.page-header-title {
+  margin: 0;
+  font-size: 26px;
+}
+
+.page-header-subtitle {
+  margin: 4px 0 0 0;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
