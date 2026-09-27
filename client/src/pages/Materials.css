@@ -15,20 +15,24 @@
 .subject-nav-item {
   text-align: left;
   padding: var(--space-sm) var(--space-md);
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: var(--radius);
-  background: var(--color-surface);
+  background: none;
+  color: var(--color-text);
   cursor: pointer;
   font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .subject-nav-item:hover {
-  border-color: var(--color-primary);
+  background-color: var(--color-bg);
 }
 
 .subject-nav-item.active {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+  background-color: var(--color-primary);
+  color: #fff;
   font-weight: 600;
 }
 
@@ -393,26 +397,33 @@
 .page-header {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
-  margin-bottom: var(--space-lg);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
 }
 
 .page-header-icon {
-  font-size: 32px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: var(--space-sm) var(--space-md);
+  font-size: 22px;
+  background: #eef2ff;
+  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 
 .page-header-title {
   margin: 0;
-  font-size: 26px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
 }
 
 .page-header-subtitle {
-  margin: 4px 0 0 0;
+  margin: 2px 0 0 0;
   color: var(--color-text-muted);
-  font-size: 14px;
+  font-size: 13px;
+  line-height: 1.2;
 }
