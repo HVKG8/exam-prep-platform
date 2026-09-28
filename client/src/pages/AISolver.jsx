@@ -1,3 +1,4 @@
+import { API_URL } from '../config'
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import './AISolver.css';
@@ -93,7 +94,7 @@ function AISolver() {
       try {
         const token = localStorage.getItem('token');
         const res = await axios.get(
-          `http://localhost:5000/api/conversations/${selectedConversationId}`,
+          API_URL + `/api/conversations/${selectedConversationId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setMessages(res.data.messages);
@@ -128,7 +129,7 @@ function AISolver() {
 
       // Step 1: get the AI answer
       const res = await axios.post(
-        'http://localhost:5000/api/ai/solve',
+        API_URL + '/api/ai/solve',
         { question: currentQuestion, marks },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -138,7 +139,7 @@ function AISolver() {
       let conversationId = selectedConversationId;
       if (!conversationId) {
         const convRes = await axios.post(
-          'http://localhost:5000/api/conversations',
+          API_URL + '/api/conversations',
           {},
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -148,7 +149,7 @@ function AISolver() {
 
       // Step 3: save this question+answer into the conversation
       await axios.post(
-        `http://localhost:5000/api/conversations/${conversationId}/messages`,
+        API_URL + `/api/conversations/${conversationId}/messages`,
         { question: currentQuestion, marks, answer: newAnswer },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -173,7 +174,7 @@ function AISolver() {
     try {
       const token = localStorage.getItem('token');
       const res = await axios.post(
-        'http://localhost:5000/api/ai/solve',
+        API_URL + '/api/ai/solve',
         { question: msg.question, marks: msg.marks },
         { headers: { Authorization: `Bearer ${token}` } }
       );

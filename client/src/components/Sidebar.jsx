@@ -1,3 +1,4 @@
+import { API_URL } from '../config'
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -20,7 +21,7 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
   const fetchConversations = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/conversations", {
+      const res = await axios.get(API_URL + "/api/conversations", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setConversations(res.data);
@@ -39,7 +40,7 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:5000/api/auth/me", {
+        const res = await axios.get(API_URL + "/api/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(res.data);
@@ -68,7 +69,7 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
     e.stopPropagation();
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/conversations/${id}`, {
+      await axios.delete(API_URL + `/api/conversations/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setConversations(conversations.filter((c) => c._id !== id));
@@ -98,7 +99,7 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
     try {
       const token = localStorage.getItem("token");
       await axios.patch(
-        `http://localhost:5000/api/conversations/${id}`,
+        API_URL + `/api/conversations/${id}`,
         { title: trimmed },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -122,7 +123,7 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        "http://localhost:5000/api/conversations",
+        API_URL + "/api/conversations",
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -1,3 +1,4 @@
+import { API_URL } from '../config'
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
@@ -55,7 +56,7 @@ function Materials() {
   const fetchUser = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/auth/me', {
+      const res = await axios.get(API_URL + '/api/auth/me', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUserRole(res.data.role);
@@ -67,7 +68,7 @@ function Materials() {
   const fetchSubjects = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/subjects', {
+      const res = await axios.get(API_URL + '/api/subjects', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSubjects(res.data);
@@ -79,7 +80,7 @@ function Materials() {
   const fetchTopics = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/topics', {
+      const res = await axios.get(API_URL + '/api/topics', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTopics(res.data);
@@ -95,12 +96,12 @@ function Materials() {
       let url;
 
       if (searchTerm) {
-        url = `http://localhost:5000/api/materials/search?query=${searchTerm}`;
+        url = API_URL + `/api/materials/search?query=${searchTerm}`;
       } else {
         const params = new URLSearchParams();
         if (subjectFilter) params.append('subject', subjectFilter);
         if (typeFilter) params.append('type', typeFilter);
-        url = `http://localhost:5000/api/materials?${params.toString()}`;
+        url = API_URL + `/api/materials?${params.toString()}`;
       }
 
       const res = await axios.get(url, {
@@ -152,7 +153,7 @@ function Materials() {
     try {
       const token = localStorage.getItem('token');
       await axios.post(
-        'http://localhost:5000/api/subjects',
+        API_URL + '/api/subjects',
         { name: newSubjectName.trim(), semester: 7 },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -179,7 +180,7 @@ function Materials() {
     try {
       const token = localStorage.getItem('token');
       await axios.post(
-        'http://localhost:5000/api/topics',
+        API_URL + '/api/topics',
         { title: newTopicTitle.trim(), subject: uploadSubject },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -195,7 +196,7 @@ function Materials() {
 
   const handleDownload = (id) => {
     const token = localStorage.getItem('token');
-    window.open(`http://localhost:5000/api/materials/${id}/download?token=${token}`, '_blank');
+    window.open(API_URL + `/api/materials/${id}/download?token=${token}`, '_blank');
   };
 
   const handleDelete = async (id) => {
@@ -204,7 +205,7 @@ function Materials() {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/materials/${id}`, {
+      await axios.delete(API_URL + `/api/materials/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchMaterials();
@@ -232,7 +233,7 @@ function Materials() {
       formData.append('subject', uploadSubject);
       if (uploadTopic) formData.append('topic', uploadTopic);
 
-      await axios.post('http://localhost:5000/api/materials', formData, {
+      await axios.post(API_URL + '/api/materials', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',

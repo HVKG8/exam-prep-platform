@@ -1,3 +1,4 @@
+import { API_URL } from '../config'
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
@@ -14,7 +15,7 @@ function Dashboard() {
       const token = localStorage.getItem('token')
 
       try {
-        const userRes = await axios.get('http://localhost:5000/api/auth/me', {
+        const userRes = await axios.get(API_URL + '/api/auth/me', {
           headers: { Authorization: `Bearer ${token}` },
         })
         setUser(userRes.data)
@@ -25,13 +26,13 @@ function Dashboard() {
 
       try {
         const [materialsRes, subjectsRes, convRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/materials', {
+          axios.get(API_URL + '/api/materials', {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get('http://localhost:5000/api/subjects', {
+          axios.get(API_URL + '/api/subjects', {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get('http://localhost:5000/api/conversations', {
+          axios.get(API_URL + '/api/conversations', {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ])

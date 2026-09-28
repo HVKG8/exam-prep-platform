@@ -1,3 +1,4 @@
+import { API_URL } from '../config'
 import { useState, useRef } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
@@ -31,7 +32,7 @@ function Register() {
     }
 
     try {
-      await axios.post('http://localhost:5000/api/auth/register', {
+      await axios.post(API_URL + '/api/auth/register', {
         name,
         email,
         password,
@@ -44,7 +45,7 @@ function Register() {
 
   async function handleGoogleSuccess(credentialResponse) {
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/google', {
+      const response = await axios.post(API_URL + '/api/auth/google', {
         credential: credentialResponse.credential,
       })
       localStorage.setItem('token', response.data.token)
