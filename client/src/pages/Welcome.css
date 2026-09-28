@@ -1,0 +1,157 @@
+.welcome-page {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 50%, #e0f2fe 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+.welcome-page::before,
+.welcome-page::after {
+  content: "";
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(90px);
+  z-index: 0;
+}
+
+.welcome-page::before {
+  width: 420px;
+  height: 420px;
+  background: rgba(99, 102, 241, 0.25);
+  top: -120px;
+  left: -120px;
+}
+
+.welcome-page::after {
+  width: 380px;
+  height: 380px;
+  background: rgba(168, 85, 247, 0.2);
+  bottom: -120px;
+  right: -100px;
+}
+
+.welcome-nav,
+.welcome-hero {
+  position: relative;
+  z-index: 1;
+}
+
+.welcome-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 32px;
+}
+
+.welcome-logo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1e1b4b;
+}
+
+.welcome-hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.welcome-hero h1 {
+  font-size: 3rem;
+  line-height: 1.15;
+  max-width: 700px;
+  color: #1e1b4b;
+  margin: 0 0 16px;
+}
+
+.welcome-hero h1 span {
+  color: #6366f1;
+}
+
+.welcome-hero p {
+  font-size: 1.15rem;
+  max-width: 560px;
+  color: #475569;
+  margin: 0 0 32px;
+}
+
+.welcome-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.welcome-btn {
+  padding: 12px 28px;
+  border-radius: 999px;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+.welcome-btn-primary {
+  background: #6366f1;
+  color: #ffffff;
+}
+
+.welcome-btn-secondary {
+  background: #ffffff;
+  color: #6366f1;
+  border: 1px solid #c7d2fe;
+}
+
+.welcome-features {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 0 24px 60px;
+}
+
+.welcome-feature-card {
+  background: #ffffff;
+  border: 1px solid #e0e7ff;
+  border-radius: 16px;
+  padding: 24px;
+  width: 280px;
+  text-align: left;
+}
+
+.welcome-feature-icon {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.welcome-feature-card h3 {
+  margin: 0 0 8px;
+  color: #1e1b4b;
+}
+
+.welcome-feature-card p {
+  margin: 0;
+  color: #475569;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.welcome-footer {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 0 20px 32px;
+  color: #64748b;
+}
+
+.welcome-footer p {
+  margin: 0 0 4px;
+  font-weight: 600;
+  color: #475569;
+}
