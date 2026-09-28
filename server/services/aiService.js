@@ -2,6 +2,17 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// Tried in order. If one is busy, the next one is used.
+const MODELS = [
+  "gemini-3.1-flash-lite",
+  "gemini-3.5-flash-lite",
+  "gemini-3.8-flash",
+  "gemini-3.7-flash",
+  "gemini-3.5-flash",
+  "gemini-flash-lite-latest",
+  "gemini-flash-latest",
+];
+
 function getStructureGuide(marks) {
   if (!marks) {
     return `No specific mark value was given for this question. Decide the most appropriate depth and structure yourself, as an experienced teacher would — this could range from a short, direct answer to a fuller structured one, depending on how much the topic naturally requires. Only use keys that are genuinely relevant to this topic; don't force in sections (like advantages/disadvantages/types) that don't naturally apply. Keep it well-organized, but only as long as the topic warrants — don't pad it out artificially.`;
@@ -19,8 +30,8 @@ Do NOT include introduction, diagram, advantages, disadvantages, applications, t
 - "explanation": the key points or working pipeline, as a short paragraph
 - "examples": an array of 1-3 short real-world examples or applications, ONLY if relevant — otherwise null
 Do NOT include introduction, advantages, disadvantages, or conclusion for this mark value.`;
-} else {
-  return `For a ${marks}-mark question, include a full structured answer:
+  } else {
+    return `For a ${marks}-mark question, include a full structured answer:
   - "introduction": 1-3 sentences introducing the topic
   - "diagram": ONLY if the topic genuinely has a visual structure that benefits from a flowchart or block diagram, provide valid Mermaid.js syntax (e.g. "flowchart TD\\nA[Input] --> B[Process] --> C[Output]") as a plain string — otherwise use null. Do NOT include explanations, backticks, or the word "mermaid" — just the raw Mermaid syntax.
   - "explanation": the main working/explanation in detail (this should be the largest section)
@@ -35,8 +46,6 @@ Skip advantages/disadvantages/applications individually if the topic doesn't nat
 }
 
 async function askGemini(question, marks) {
-  const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash-lite" });
-
   const marksLine = marks
     ? `Marks: ${marks}`
     : `Marks: not specified — decide the appropriate depth and length yourself`;
@@ -50,8 +59,31 @@ ${getStructureGuide(marks)}
 
 Respond with ONLY a valid JSON object (no markdown code fences, no extra text before or after) using exactly these possible keys: "introduction", "definition", "diagram", "explanation", "types", "advantages", "disadvantages", "applications", "examples", "conclusion". Only include the keys relevant to this mark value as described above; omit or set null any key that doesn't apply. "advantages", "disadvantages", "applications", "types", and "examples" should be arrays of short strings when included. The "diagram" field, when included, must be raw Mermaid.js syntax only (no backticks, no "mermaid" label, no explanation text). All other fields should be plain strings.`;
 
-  const result = await model.generateContent(prompt);
-  const rawText = result.response.text();
+  let lastError;
+  let rawText = null;
+
+    for (let round = 1; round <= 2 && rawText === null; round++) {
+    for (const name of MODELS) {
+      try {
+        const model = genAI.getGenerativeModel({ model: name }, { timeout: 30000 });
+        const result = await model.generateContent(prompt);
+        rawText = result.response.text();
+        console.log("Answered by model:", name);
+        break;
+      } catch (err) {
+        console.error(`Model ${name} failed:`, err.message);
+        lastError = err;
+      }
+    }
+    // wait 3 seconds before trying the whole list a second time
+    if (rawText === null && round < 2) {
+      await new Promise((r) => setTimeout(r, 3000));
+    }
+  }
+
+  if (rawText === null) {
+    throw lastError || new Error("All AI models are busy");
+  }
 
   // Gemini sometimes wraps JSON in ```json ... ``` fences even when told not to - strip those before parsing
   const cleaned = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
