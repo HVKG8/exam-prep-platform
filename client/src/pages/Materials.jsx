@@ -24,6 +24,8 @@ function Materials() {
   const [topicMessage, setTopicMessage] = useState('');
   const [addingTopic, setAddingTopic] = useState(false);
   const [expandedTopics, setExpandedTopics] = useState({});
+  const [visibleCount, setVisibleCount] = useState(9);
+  const [showUpload, setShowUpload] = useState(false);
 
   const [uploadTitle, setUploadTitle] = useState('');
   const [uploadType, setUploadType] = useState('notes');
@@ -126,8 +128,14 @@ function Materials() {
     fetchMaterials();
   }, [subjectFilter, typeFilter]);
 
+  // Start again from the first 9 cards whenever the filters change
+  useEffect(() => {
+    setVisibleCount(9);
+  }, [subjectFilter, typeFilter]);
+
   const handleSearch = (e) => {
     e.preventDefault();
+    setVisibleCount(9);
     fetchMaterials();
   };
 
@@ -292,14 +300,14 @@ function Materials() {
       <Sidebar />
       <div className="page-container page-container-wide">
         <div className="page-header">
-  <div className="page-header-icon">📖</div>
-  <div>
-    <h1 className="page-header-title">Study Materials</h1>
-    <p className="page-header-subtitle">
-      Access organized notes, papers, diagrams, and more for all your subjects.
-    </p>
-  </div>
-</div>
+          <div className="page-header-icon">📖</div>
+          <div>
+            <h1 className="page-header-title">Study Materials</h1>
+            <p className="page-header-subtitle">
+              Access organized notes, papers, diagrams, and more for all your subjects.
+            </p>
+          </div>
+        </div>
 
         <div className="materials-body">
           {/* LEFT PANEL: Subjects */}
@@ -381,22 +389,22 @@ function Materials() {
               </div>
             </div>
             <div className="subject-shortcut-bar">
-  <button
-    className={`subject-shortcut ${subjectFilter === '' ? 'active' : ''}`}
-    onClick={() => handleSubjectClick('')}
-  >
-    📚 All Subjects
-  </button>
-  {subjects.map((s) => (
-    <button
-      key={s._id}
-      className={`subject-shortcut ${subjectFilter === s._id ? 'active' : ''}`}
-      onClick={() => handleSubjectClick(s._id)}
-    >
-      {s.name}
-    </button>
-  ))}
-</div>
+              <button
+                className={`subject-shortcut ${subjectFilter === '' ? 'active' : ''}`}
+                onClick={() => handleSubjectClick('')}
+              >
+                📚 All Subjects
+              </button>
+              {subjects.map((s) => (
+                <button
+                  key={s._id}
+                  className={`subject-shortcut ${subjectFilter === s._id ? 'active' : ''}`}
+                  onClick={() => handleSubjectClick(s._id)}
+                >
+                  {s.name}
+                </button>
+              ))}
+            </div>
 
             {loading && <p>Loading...</p>}
             {error && <p className="error-text">{error}</p>}
@@ -446,36 +454,56 @@ function Materials() {
                   })}
                 </div>
               ) : (
-                <div className="materials-grid">
-                  {materials.map((m) => (
-                    <div key={m._id} className="material-card">
-                      <div className="material-card-icon">{getTypeIcon(m.type)}</div>
-                      <div className="material-card-body">
-                        <h4 className="material-card-title">{m.title}</h4>
-                        <p className="material-card-subject">{m.subject?.name}</p>
-                        <span className="material-card-badge">{m.type}</span>
-                      </div>
-                      <div className="material-card-actions">
-                        <button onClick={() => handleDownload(m._id)} className="btn-outline">
-                          Download
-                        </button>
-                        {(userRole === 'teacher' || userRole === 'admin') && (
-                          <button onClick={() => handleDelete(m._id)} className="btn-danger">
-                            Delete
+                <>
+                  <div className="materials-grid">
+                    {materials.slice(0, visibleCount).map((m) => (
+                      <div key={m._id} className="material-card">
+                        <div className="material-card-icon">{getTypeIcon(m.type)}</div>
+                        <div className="material-card-body">
+                          <h4 className="material-card-title">{m.title}</h4>
+                          <p className="material-card-subject">{m.subject?.name}</p>
+                          <span className="material-card-badge">{m.type}</span>
+                        </div>
+                        <div className="material-card-actions">
+                          <button onClick={() => handleDownload(m._id)} className="btn-outline">
+                            Download
                           </button>
-                        )}
+                          {(userRole === 'teacher' || userRole === 'admin') && (
+                            <button onClick={() => handleDelete(m._id)} className="btn-danger">
+                              Delete
+                            </button>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+
+                  {materials.length > visibleCount && (
+                    <button
+                      className="show-more-btn"
+                      onClick={() => setVisibleCount(visibleCount + 9)}
+                    >
+                      Show more ({materials.length - visibleCount} left)
+                    </button>
+                  )}
+                </>
               )
             )}
 
             {(userRole === 'teacher' || userRole === 'admin') && (
               <div className="card upload-section">
-                <h3>Upload Material</h3>
-                <form onSubmit={handleUpload} className="upload-form">
-                  <input
+                <button
+  type="button"
+  className="upload-toggle"
+  onClick={() => setShowUpload(!showUpload)}
+>
+  <span>⬆️ Upload Material</span>
+  <span>{showUpload ? '▴' : '▾'}</span>
+</button>
+<form
+  onSubmit={handleUpload}
+  className={`upload-form ${showUpload ? '' : 'upload-hidden'}`}
+>                  <input
                     type="text"
                     className="input"
                     placeholder="Title"

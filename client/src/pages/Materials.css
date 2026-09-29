@@ -433,3 +433,84 @@
   font-size: 10px;
   line-height: 1.2;
 }
+
+/* Compact material cards */
+.materials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+.material-card {
+  padding: 12px 14px;
+  gap: 4px;
+  border-radius: 12px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.material-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15);
+}
+
+.material-card button,
+.material-card a {
+  padding: 4px 10px;
+  font-size: 0.8rem;
+}
+
+.show-more-btn {
+  display: block;
+  margin: 16px auto 0;
+  padding: 8px 20px;
+  border: 1px solid var(--color-primary);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.show-more-btn:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.upload-toggle {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--color-primary);
+}
+
+.upload-toggle:hover {
+  opacity: 0.8;
+}
+
+.upload-hidden {
+  display: none;
+}
+
+.upload-section {
+  width: 100%;
+  max-width: none;
+  margin-top: 24px;
+  padding: 16px 20px;
+}
+
+.upload-toggle {
+  margin-bottom: 0;
+}
+
+.upload-form:not(.upload-hidden) {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
