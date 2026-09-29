@@ -84,6 +84,7 @@ function AISolver() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [regeneratingIndex, setRegeneratingIndex] = useState(null);
   const [pendingQuestion, setPendingQuestion] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     const loadConversation = async () => {
@@ -117,6 +118,7 @@ function AISolver() {
     const currentQuestion = question.trim();
     if (!currentQuestion) return;
 
+    setErrorMessage('');
     setPendingQuestion(currentQuestion);
     setQuestion('');
     if (textareaRef.current) {
@@ -162,6 +164,8 @@ function AISolver() {
       setRefreshTrigger((prev) => prev + 1);
     } catch (err) {
       console.error(err);
+      setErrorMessage('The AI is busy right now. Please try again in a moment.');
+      setQuestion(currentQuestion);
     } finally {
       setLoading(false);
       setPendingQuestion('');
@@ -183,6 +187,7 @@ function AISolver() {
       setMessages(updated);
     } catch (err) {
       console.error(err);
+      setErrorMessage('The AI is busy right now. Please try again in a moment.');
     } finally {
       setRegeneratingIndex(null);
     }
@@ -284,6 +289,8 @@ function AISolver() {
             </div>
           )}
         </div>
+
+        {errorMessage && <div className="solver-error">{errorMessage}</div>}
 
         <form onSubmit={handleSubmit} className="solver-input-form">
           <div className="marks-bar">
