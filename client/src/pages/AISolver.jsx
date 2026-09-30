@@ -38,6 +38,20 @@ const sectionIcons = {
   conclusion: '🏁',
 };
 
+// Fixed display order, so the conclusion always comes last
+const sectionOrder = [
+  'introduction', 'definition', 'diagram', 'explanation', 'types',
+  'advantages', 'disadvantages', 'applications', 'examples', 'conclusion',
+];
+
+function sortedEntries(answer) {
+  return Object.entries(answer).sort(([a], [b]) => {
+    const ia = sectionOrder.indexOf(a);
+    const ib = sectionOrder.indexOf(b);
+    return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+  });
+}
+
 function AnswerSection({ label, value }) {
   if (value === null || value === undefined || value === '') return null;
 
@@ -244,7 +258,7 @@ function AISolver() {
                   <div className="chat-row assistant-row">
                     <div className="chat-avatar bot-avatar">🤖</div>
                     <div className="chat-bubble assistant-bubble">
-                      {Object.entries(msg.answer).map(([key, value]) => (
+                      {sortedEntries(msg.answer).map(([key, value]) => (
                         <AnswerSection key={key} label={key} value={value} />
                       ))}
                       <div className="assistant-bubble-footer">
