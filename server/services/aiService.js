@@ -4,18 +4,21 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Tried in order. If one is busy, the next one is used.
 const MODELS = [
+  "gemini-3.5-flash",
+  "gemini-flash-latest",
   "gemini-3.1-flash-lite",
   "gemini-3.5-flash-lite",
+  "gemini-flash-lite-latest",
   "gemini-3.8-flash",
   "gemini-3.7-flash",
-  "gemini-3.5-flash",
-  "gemini-flash-lite-latest",
-  "gemini-flash-latest",
 ];
 
 function getStructureGuide(marks) {
   if (!marks) {
-    return `No specific mark value was given for this question. Decide the most appropriate depth and structure yourself, as an experienced teacher would — this could range from a short, direct answer to a fuller structured one, depending on how much the topic naturally requires. Only use keys that are genuinely relevant to this topic; don't force in sections (like advantages/disadvantages/types) that don't naturally apply. Keep it well-organized, but only as long as the topic warrants — don't pad it out artificially.`;
+    return `No specific mark value was given. First judge the question yourself:
+- If it is a simple or quick question (a calculation, a one-fact answer, a basic definition, or a casual message), answer briefly and directly. Return ONLY {"explanation": "..."} and put the working in that one string. No introduction, no conclusion.
+- If it is a real concept question, answer like an experienced teacher would. Give a clear definition and a thorough explanation. In the explanation, if the topic has parts (conditions, steps, layers, components), cover each one separately with a short explanation of what it means. If the topic is a problem, also explain how it is prevented or solved. Add examples (prefer computing or engineering examples), types, or a diagram only where they genuinely help.
+Never pad the answer, and never add sections just to fill space.`;
   } else if (marks <= 2) {
     return `For a ${marks}-mark question, keep it brief:
 - "definition": the direct definition/answer (this should carry most of the marks)
@@ -57,15 +60,19 @@ ${marksLine}
 
 ${getStructureGuide(marks)}
 
+PRIORITY RULE (overrides the structure above): If the student's question itself asks for a specific length or style (for example "in one line", "briefly", "in short", "in simple words", "explain like I'm 5"), obey that instruction exactly. In that case return ONLY {"explanation": "your answer here"} with no other keys.
+
+FORMATTING RULE: Inside any text field (like "explanation"), whenever you list numbered points, conditions, or steps, put each one on its own line, separated by \\n, and start the line with its number (for example "1. Mutual Exclusion: ...\\n2. Hold and Wait: ..."). Do not run them together in one paragraph. Do not repeat the same information in "introduction" and "definition".
+
 Respond with ONLY a valid JSON object (no markdown code fences, no extra text before or after) using exactly these possible keys: "introduction", "definition", "diagram", "explanation", "types", "advantages", "disadvantages", "applications", "examples", "conclusion". Only include the keys relevant to this mark value as described above; omit or set null any key that doesn't apply. "advantages", "disadvantages", "applications", "types", and "examples" should be arrays of short strings when included. The "diagram" field, when included, must be raw Mermaid.js syntax only (no backticks, no "mermaid" label, no explanation text). All other fields should be plain strings.`;
 
   let lastError;
   let rawText = null;
 
-    for (let round = 1; round <= 2 && rawText === null; round++) {
+  for (let round = 1; round <= 2 && rawText === null; round++) {
     for (const name of MODELS) {
       try {
-        const model = genAI.getGenerativeModel({ model: name }, { timeout: 30000 });
+        const model = genAI.getGenerativeModel({ model: name }, { timeout: 15000 });
         const result = await model.generateContent(prompt);
         rawText = result.response.text();
         console.log("Answered by model:", name);

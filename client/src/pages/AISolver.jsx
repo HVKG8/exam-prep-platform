@@ -66,7 +66,7 @@ function AnswerSection({ label, value }) {
           ))}
         </ul>
       ) : (
-        <p>{value}</p>
+        <p style={{ whiteSpace: 'pre-line' }}>{value}</p>
       )}
     </div>
   );
