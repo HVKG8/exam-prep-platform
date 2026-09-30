@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard'
 import ProtectedRoute from './components/ProtectedRoute'
 import AISolver from './pages/AISolver';
 import Materials from './pages/Materials';
+import VoiceTest from './pages/VoiceTest';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         />
         <Route path="/solver" element={<ProtectedRoute><AISolver /></ProtectedRoute>} />
         <Route path="/materials" element={<ProtectedRoute><Materials /></ProtectedRoute>} />
+        <Route path="/voice-test" element={<VoiceTest />} />
       </Routes>
     </BrowserRouter>
   )
