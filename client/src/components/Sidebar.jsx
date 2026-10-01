@@ -13,6 +13,7 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
   const [renameValue, setRenameValue] = useState("");
   const [user, setUser] = useState(null);
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -64,6 +65,11 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
     document.addEventListener("click", closeMenus);
     return () => document.removeEventListener("click", closeMenus);
   }, []);
+
+  // close the mobile drawer whenever the page changes
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
 
   const handleConfirmDelete = async (e, id) => {
     e.stopPropagation();
@@ -129,6 +135,7 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
       );
       setConversations([res.data, ...conversations]);
       if (onSelectConversation) onSelectConversation(res.data._id);
+      setMobileOpen(false);
     } catch (error) {
       console.error(error);
     }
@@ -151,132 +158,154 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
   ];
 
   return (
-    <div className="sidebar">
-      <div className="sidebar-logo">
-        🎓 ExamPrep <span>AI</span>
+    <>
+      <div className="mobile-topbar">
+        <button
+          className="mobile-menu-btn"
+          onClick={() => setMobileOpen(true)}
+          aria-label="Open menu"
+        >
+          ☰
+        </button>
+        <span className="mobile-topbar-title">
+          🎓 ExamPrep <span>AI</span>
+        </span>
       </div>
 
-      <div className="sidebar-main">
-        <nav className="sidebar-nav">
-          {navLinks.map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              className={`sidebar-nav-link ${location.pathname === link.to ? "active" : ""}`}
-            >
-              <span>{link.icon}</span>
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+      {mobileOpen && (
+        <div className="sidebar-overlay" onClick={() => setMobileOpen(false)} />
+      )}
 
-        {isSolverPage && (
-          <>
-            <hr className="sidebar-divider" />
+      <div className={`sidebar ${mobileOpen ? "open" : ""}`}>
+        <div className="sidebar-logo">
+          🎓 ExamPrep <span>AI</span>
+        </div>
 
-            <button className="sidebar-new-chat-btn" onClick={handleNewChat}>
-              + New Chat
-            </button>
+        <div className="sidebar-main">
+          <nav className="sidebar-nav">
+            {navLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`sidebar-nav-link ${location.pathname === link.to ? "active" : ""}`}
+              >
+                <span>{link.icon}</span>
+                {link.label}
+              </Link>
+            ))}
+          </nav>
 
-            <ul className="sidebar-chat-list">
-              {conversations.map((conv) => (
-                <li
-                  key={conv._id}
-                  onClick={() => onSelectConversation(conv._id)}
-                  className={`sidebar-chat-item ${conv._id === selectedConversationId ? "active" : ""}`}
-                >
-                  {renamingId === conv._id ? (
-                    <input
-                      className="sidebar-chat-rename-input"
-                      value={renameValue}
-                      onChange={(e) => setRenameValue(e.target.value)}
-                      onClick={(e) => e.stopPropagation()}
-                      onKeyDown={handleRenameKeyDown}
-                      onBlur={() => submitRename(conv._id)}
-                      autoFocus
-                    />
-                  ) : (
-                    <span className="sidebar-chat-title">{conv.title}</span>
-                  )}
+          {isSolverPage && (
+            <>
+              <hr className="sidebar-divider" />
 
-                  <div className="sidebar-chat-menu-wrapper">
-                    <button
-                      className="sidebar-chat-dots"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setDeleteConfirmId(null);
-                        setOpenMenuId(openMenuId === conv._id ? null : conv._id);
-                      }}
-                    >
-                      ⋮
-                    </button>
-                    {openMenuId === conv._id && (
-                      <div className="sidebar-chat-dropdown" onClick={(e) => e.stopPropagation()}>
-                        {deleteConfirmId === conv._id ? (
-                          <>
-                            <span className="sidebar-chat-confirm-text">Delete this chat?</span>
-                            <button onClick={(e) => handleConfirmDelete(e, conv._id)}>
-                              Confirm
-                            </button>
-                            <button onClick={() => setDeleteConfirmId(null)}>Cancel</button>
-                          </>
-                        ) : (
-                          <>
-                            <button onClick={(e) => startRename(e, conv._id, conv.title)}>
-                              ✏ Rename
-                            </button>
-                            <button onClick={() => setDeleteConfirmId(conv._id)}>
-                              🗑 Delete
-                            </button>
-                          </>
-                        )}
-                      </div>
+              <button className="sidebar-new-chat-btn" onClick={handleNewChat}>
+                + New Chat
+              </button>
+
+              <ul className="sidebar-chat-list">
+                {conversations.map((conv) => (
+                  <li
+                    key={conv._id}
+                    onClick={() => {
+                      onSelectConversation(conv._id);
+                      setMobileOpen(false);
+                    }}
+                    className={`sidebar-chat-item ${conv._id === selectedConversationId ? "active" : ""}`}
+                  >
+                    {renamingId === conv._id ? (
+                      <input
+                        className="sidebar-chat-rename-input"
+                        value={renameValue}
+                        onChange={(e) => setRenameValue(e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                        onKeyDown={handleRenameKeyDown}
+                        onBlur={() => submitRename(conv._id)}
+                        autoFocus
+                      />
+                    ) : (
+                      <span className="sidebar-chat-title">{conv.title}</span>
                     )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </>
+
+                    <div className="sidebar-chat-menu-wrapper">
+                      <button
+                        className="sidebar-chat-dots"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteConfirmId(null);
+                          setOpenMenuId(openMenuId === conv._id ? null : conv._id);
+                        }}
+                      >
+                        ⋮
+                      </button>
+                      {openMenuId === conv._id && (
+                        <div className="sidebar-chat-dropdown" onClick={(e) => e.stopPropagation()}>
+                          {deleteConfirmId === conv._id ? (
+                            <>
+                              <span className="sidebar-chat-confirm-text">Delete this chat?</span>
+                              <button onClick={(e) => handleConfirmDelete(e, conv._id)}>
+                                Confirm
+                              </button>
+                              <button onClick={() => setDeleteConfirmId(null)}>Cancel</button>
+                            </>
+                          ) : (
+                            <>
+                              <button onClick={(e) => startRename(e, conv._id, conv.title)}>
+                                ✏ Rename
+                              </button>
+                              <button onClick={() => setDeleteConfirmId(conv._id)}>
+                                🗑 Delete
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+
+        {user && (
+          <div className="sidebar-profile-wrapper">
+            {profileOpen && (
+              <div className="sidebar-profile-panel" onClick={(e) => e.stopPropagation()}>
+                <p className="sidebar-profile-role-line">
+                  Role: <span>{user.role}</span>
+                </p>
+                <button className="sidebar-theme-toggle-item" onClick={toggleTheme}>
+                  {theme === "light" ? "🌙 Dark Mode" : "☀️ Light Mode"}
+                </button>
+                <button onClick={handleLogout} className="sidebar-logout-btn">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                  </svg>
+                  Logout
+                </button>
+              </div>
+            )}
+            <div
+              className="sidebar-footer"
+              onClick={(e) => {
+                e.stopPropagation();
+                setProfileOpen((prev) => !prev);
+              }}
+            >
+              <div className="sidebar-avatar">{user.name.charAt(0).toUpperCase()}</div>
+              <div className="sidebar-footer-text">
+                <p className="sidebar-username">{user.name}</p>
+                <p className="sidebar-role">{user.role}</p>
+              </div>
+              <span className="sidebar-profile-chevron">{profileOpen ? '▾' : '▸'}</span>
+            </div>
+          </div>
         )}
       </div>
-
-      {user && (
-        <div className="sidebar-profile-wrapper">
-          {profileOpen && (
-            <div className="sidebar-profile-panel" onClick={(e) => e.stopPropagation()}>
-              <p className="sidebar-profile-role-line">
-                Role: <span>{user.role}</span>
-              </p>
-              <button className="sidebar-theme-toggle-item" onClick={toggleTheme}>
-                {theme === "light" ? "🌙 Dark Mode" : "☀️ Light Mode"}
-              </button>
-              <button onClick={handleLogout} className="sidebar-logout-btn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                  <polyline points="16 17 21 12 16 7" />
-                  <line x1="21" y1="12" x2="9" y2="12" />
-                </svg>
-                Logout
-              </button>
-            </div>
-          )}
-          <div
-            className="sidebar-footer"
-            onClick={(e) => {
-              e.stopPropagation();
-              setProfileOpen((prev) => !prev);
-            }}
-          >
-            <div className="sidebar-avatar">{user.name.charAt(0).toUpperCase()}</div>
-            <div className="sidebar-footer-text">
-              <p className="sidebar-username">{user.name}</p>
-              <p className="sidebar-role">{user.role}</p>
-            </div>
-            <span className="sidebar-profile-chevron">{profileOpen ? '▾' : '▸'}</span>
-          </div>
-        </div>
-      )}
-    </div>
+    </>
   );
 }
 
