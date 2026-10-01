@@ -32,6 +32,7 @@ app.use("/api/notes", noteRoutes);
 app.use("/api/ai", require("./routes/aiRoutes"));
 app.use("/api/materials", materialRoutes);
 app.use("/api/conversations", conversationRoutes);
+app.use("/api/viva", require("./routes/vivaRoutes"));
 
 app.use((err, req, res, next) => {
   console.error("SERVER ERROR:", err);
