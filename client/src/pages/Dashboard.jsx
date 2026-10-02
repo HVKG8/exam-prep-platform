@@ -158,10 +158,16 @@ function Dashboard() {
               <p>Visual concepts for better understanding.</p>
             </Link>
 
-            <Link to="/materials?type=revision" className="quick-card">
+                        <Link to="/materials?type=revision" className="quick-card">
               <div className="quick-icon quick-icon-orange">⚡</div>
               <h3>Quick Revision</h3>
               <p>Important formulas, short notes & more.</p>
+            </Link>
+
+            <Link to="/viva" className="quick-card">
+              <div className="quick-icon quick-icon-cyan">🎤</div>
+              <h3>Viva Prep</h3>
+              <p>Practise answering out loud with an AI examiner.</p>
             </Link>
           </div>
         </div>
