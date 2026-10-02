@@ -8,7 +8,6 @@ import ServerWakeNotice from './components/ServerWakeNotice'
 import AISolver from './pages/AISolver';
 import Materials from './pages/Materials';
 import Viva from './pages/Viva';
-import VoiceTest from './pages/VoiceTest';
 
 function App() {
   return (
@@ -29,7 +28,6 @@ function App() {
         <Route path="/solver" element={<ProtectedRoute><AISolver /></ProtectedRoute>} />
         <Route path="/materials" element={<ProtectedRoute><Materials /></ProtectedRoute>} />
         <Route path="/viva" element={<ProtectedRoute><Viva /></ProtectedRoute>} />
-        <Route path="/voice-test" element={<VoiceTest />} />
       </Routes>
     </BrowserRouter>
   )
