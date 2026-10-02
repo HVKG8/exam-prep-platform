@@ -223,7 +223,7 @@ function AISolver() {
   };
 
   return (
-    <div style={{ display: 'flex' }}>
+    <div className="solver-layout">
       <Sidebar
         selectedConversationId={selectedConversationId}
         onSelectConversation={setSelectedConversationId}

@@ -514,3 +514,141 @@
   padding-top: 16px;
   border-top: 1px solid var(--color-border);
 }
+
+/* ===== Mobile layout ===== */
+@media (max-width: 768px) {
+  .page-container-wide {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 12px;
+  }
+
+  .page-header {
+    margin: 0 0 12px;
+    padding: 8px 0;
+    gap: 12px;
+  }
+
+  .page-header-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+    border-radius: 12px;
+  }
+
+  .page-header-title {
+    margin: 0;
+    font-size: 20px;
+  }
+
+  .page-header-subtitle {
+    font-size: 12px;
+  }
+
+  /* subjects, quick access and cards stack in one column */
+  .materials-body {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .materials-main-panel {
+    width: 100%;
+  }
+
+  /* subject list becomes a swipeable row of chips */
+  .materials-subjects-panel {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    overflow-x: auto;
+    gap: 6px;
+    padding: 8px;
+    scrollbar-width: thin;
+  }
+
+  .subject-nav-item {
+    flex-shrink: 0;
+    white-space: nowrap;
+    border: 1px solid var(--color-border);
+    padding: 8px 14px;
+  }
+
+  .subject-nav-item.active {
+    border-color: var(--color-primary);
+  }
+
+  .add-subject-form {
+    flex: 0 0 240px;
+    flex-direction: row;
+    align-items: center;
+    margin: 0 0 0 4px;
+    padding: 0 0 0 10px;
+    border-top: none;
+    border-left: 1px solid var(--color-border);
+  }
+
+  .add-subject-form .input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* type tabs already do this job, so hide the duplicate box */
+  .materials-quick-access {
+    display: none;
+  }
+
+  .search-form {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .search-input {
+    min-width: 0;
+  }
+
+  .type-tabs {
+    gap: 16px;
+  }
+
+  /* one card per row, full width */
+  .materials-grid,
+  .topic-section .materials-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .topic-section .materials-grid {
+    padding: 12px;
+  }
+
+  .material-card-actions {
+    flex-wrap: wrap;
+  }
+
+  .subject-hero {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .subject-hero-icon {
+    font-size: 28px;
+    padding: 10px;
+  }
+
+  .subject-hero-title {
+    font-size: 18px;
+  }
+
+  .subject-hero-subtitle {
+    font-size: 13px;
+  }
+
+  .upload-section {
+    padding: 12px;
+  }
+
+  .add-topic-inline {
+    flex-wrap: wrap;
+  }
+}
