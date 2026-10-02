@@ -155,6 +155,7 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
     { to: "/dashboard", label: "Home", icon: "🏠" },
     { to: "/materials", label: "Material", icon: "📘" },
     { to: "/solver", label: "AI Tutor", icon: "🤖" },
+    { to: "/viva", label: "Viva Prep", icon: "🎤" },
   ];
 
   return (
