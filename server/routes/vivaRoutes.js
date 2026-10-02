@@ -64,6 +64,66 @@ router.get("/", protect, async (req, res) => {
   }
 });
 
+// My progress: totals, the last 7 finished sessions, and the weakest topics.
+// (This must stay above "/:id", otherwise "stats" would be read as an id.)
+router.get("/stats", protect, async (req, res) => {
+  try {
+    const sessions = await VivaSession.find({ student: req.user._id })
+      .sort({ createdAt: 1 })
+      .limit(200)
+      .select("subject topic status readiness createdAt items.answer items.feedback.readiness")
+      .lean();
+
+    const points = { needs_practice: 0, getting_there: 1, strong: 2 };
+    const finished = sessions.filter((s) => s.status === "finished");
+
+    let answeredQuestions = 0;
+    const byTopic = {};
+
+    sessions.forEach((s) => {
+      s.items.forEach((item) => {
+        if (item.answer) answeredQuestions += 1;
+
+        if (item.feedback && item.feedback.readiness) {
+          const key = s.subject + "||" + (s.topic || "");
+          if (!byTopic[key]) {
+            byTopic[key] = { subject: s.subject, topic: s.topic || "", total: 0, count: 0 };
+          }
+          byTopic[key].total += points[item.feedback.readiness];
+          byTopic[key].count += 1;
+        }
+      });
+    });
+
+    const weakest = Object.values(byTopic)
+      .map((t) => {
+        const average = t.total / t.count;
+        let level = "strong";
+        if (average < 0.75) level = "needs_practice";
+        else if (average < 1.5) level = "getting_there";
+        return { subject: t.subject, topic: t.topic, answered: t.count, average, level };
+      })
+      .filter((t) => t.level !== "strong")
+      .sort((a, b) => a.average - b.average)
+      .slice(0, 3);
+
+    const trend = finished.slice(-7).map((s) => ({
+      date: s.createdAt,
+      readiness: s.readiness,
+    }));
+
+    res.json({
+      totalSessions: sessions.length,
+      finishedSessions: finished.length,
+      answeredQuestions,
+      weakest,
+      trend,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch viva stats", error: error.message });
+  }
+});
+
 // Get one full session.
 router.get("/:id", protect, async (req, res) => {
   try {

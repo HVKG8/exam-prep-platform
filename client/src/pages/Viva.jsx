@@ -69,6 +69,7 @@ function Viva() {
   const [subjectId, setSubjectId] = useState('');
   const [topicId, setTopicId] = useState('');
   const [past, setPast] = useState([]);
+  const [stats, setStats] = useState(null);
 
   const [starting, setStarting] = useState(false);
   const [session, setSession] = useState(null);
@@ -92,6 +93,15 @@ function Viva() {
     }
   };
 
+  const refreshStats = async () => {
+    try {
+      const res = await axios.get(API_URL + '/api/viva/stats', authConfig());
+      setStats(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     const load = async () => {
       try {
@@ -108,6 +118,7 @@ function Viva() {
         console.error(err);
       }
       refreshPast();
+      refreshStats();
     };
     load();
   }, []);
@@ -164,6 +175,24 @@ function Viva() {
     } finally {
       setStarting(false);
     }
+  };
+
+  // "Practise this": fill in the subject and topic, then the student taps Start
+  const handlePractise = (subjectName, topicTitle) => {
+    const subject = subjects.find((s) => s.name === subjectName);
+    if (!subject) {
+      setError('That subject is no longer available.');
+      return;
+    }
+    setError('');
+    setSubjectId(subject._id);
+    const topic = topics.find(
+      (t) =>
+        t.title === topicTitle &&
+        (t.subject && t.subject._id ? t.subject._id : t.subject) === subject._id
+    );
+    setTopicId(topic ? topic._id : '');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleStop = () => {
@@ -242,6 +271,7 @@ function Viva() {
       setSession(res.data);
       setView('summary');
       refreshPast();
+      refreshStats();
     } catch (err) {
       setError(err.response?.data?.message || 'Could not finish the viva.');
     } finally {
@@ -279,6 +309,7 @@ function Viva() {
     setText('');
     setError('');
     refreshPast();
+    refreshStats();
   };
 
   /* ---------------- SETUP ---------------- */
@@ -345,6 +376,77 @@ function Viva() {
           Practice only. The AI can make mistakes, so check important answers in your notes.
         </p>
       </div>
+
+      {stats && stats.totalSessions > 0 && (
+        <div className="viva-card">
+          <h2 className="viva-progress-heading">Your progress</h2>
+
+          <div className="viva-stat-row">
+            <div className="viva-stat">
+              <p className="viva-stat-num">{stats.finishedSessions}</p>
+              <p className="viva-stat-label">Vivas finished</p>
+            </div>
+            <div className="viva-stat">
+              <p className="viva-stat-num">{stats.answeredQuestions}</p>
+              <p className="viva-stat-label">Questions answered</p>
+            </div>
+          </div>
+
+          {stats.trend.length > 0 && (
+            <>
+              <label className="viva-label">Your last {stats.trend.length} vivas</label>
+              <div className="viva-dots">
+                {stats.trend.map((t, i) => {
+                  const r = READINESS[t.readiness] || READINESS.getting_there;
+                  return (
+                    <span
+                      key={i}
+                      className={`viva-dot ${r.cls}`}
+                      title={`${r.label} · ${new Date(t.date).toLocaleDateString()}`}
+                      aria-label={r.label}
+                    />
+                  );
+                })}
+              </div>
+              <p className="viva-note">
+                Oldest on the left. Red = needs practice, yellow = getting there, green = strong.
+              </p>
+            </>
+          )}
+
+          {stats.weakest.length > 0 ? (
+            <>
+              <label className="viva-label">Practise these next</label>
+              {stats.weakest.map((w, i) => {
+                const r = READINESS[w.level] || READINESS.getting_there;
+                return (
+                  <div key={i} className="viva-weak-item">
+                    <div className="viva-weak-text">
+                      <p className="viva-weak-title">
+                        {w.subject}
+                        {w.topic ? ` · ${w.topic}` : ''}
+                      </p>
+                      <p className="viva-note">
+                        {r.label} · based on {w.answered} answer{w.answered === 1 ? '' : 's'}
+                      </p>
+                    </div>
+                    <button
+                      className="viva-practise-btn"
+                      onClick={() => handlePractise(w.subject, w.topic)}
+                    >
+                      Practise this
+                    </button>
+                  </div>
+                );
+              })}
+            </>
+          ) : (
+            stats.answeredQuestions > 0 && (
+              <p className="viva-note">No weak topics so far. Keep practising!</p>
+            )
+          )}
+        </div>
+      )}
 
       {past.length > 0 && (
         <div className="viva-past">

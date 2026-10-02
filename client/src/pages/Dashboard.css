@@ -379,3 +379,16 @@
     gap: 12px;
   }
 }
+
+/* ===== Four stat cards ===== */
+@media (min-width: 769px) {
+  .dashboard-stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1100px) {
+  .dashboard-stats-row {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

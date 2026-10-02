@@ -8,7 +8,12 @@ import './Dashboard.css'
 function Dashboard() {
   const [user, setUser] = useState(null)
   const [error, setError] = useState('')
-  const [stats, setStats] = useState({ materials: null, subjects: null, conversations: null })
+  const [stats, setStats] = useState({
+    materials: null,
+    subjects: null,
+    conversations: null,
+    vivas: null,
+  })
 
   useEffect(() => {
     async function fetchAll() {
@@ -24,6 +29,18 @@ function Dashboard() {
         return
       }
 
+      // Viva stat has its own request, so it can never break the other stats
+      axios
+        .get(API_URL + '/api/viva/stats', {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => {
+          setStats((prev) => ({ ...prev, vivas: res.data.finishedSessions }))
+        })
+        .catch((err) => {
+          console.error('Could not load viva stats', err)
+        })
+
       try {
         const [materialsRes, subjectsRes, convRes] = await Promise.all([
           axios.get(API_URL + '/api/materials', {
@@ -36,11 +53,12 @@ function Dashboard() {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ])
-        setStats({
+        setStats((prev) => ({
+          ...prev,
           materials: materialsRes.data.length,
           subjects: subjectsRes.data.length,
           conversations: convRes.data.length,
-        })
+        }))
       } catch (err) {
         console.error('Could not load stats', err)
       }
@@ -107,6 +125,13 @@ function Dashboard() {
               <p className="stat-label">AI Conversations</p>
             </div>
           </div>
+          <div className="stat-card">
+            <div className="stat-icon stat-icon-green">🎤</div>
+            <div>
+              <p className="stat-number">{stats.vivas ?? '—'}</p>
+              <p className="stat-label">Vivas Finished</p>
+            </div>
+          </div>
         </div>
 
         <div className="dashboard-feature-grid">
@@ -158,7 +183,7 @@ function Dashboard() {
               <p>Visual concepts for better understanding.</p>
             </Link>
 
-                        <Link to="/materials?type=revision" className="quick-card">
+            <Link to="/materials?type=revision" className="quick-card">
               <div className="quick-icon quick-icon-orange">⚡</div>
               <h3>Quick Revision</h3>
               <p>Important formulas, short notes & more.</p>
