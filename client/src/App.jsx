@@ -4,6 +4,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import ProtectedRoute from './components/ProtectedRoute'
+import ServerWakeNotice from './components/ServerWakeNotice'
 import AISolver from './pages/AISolver';
 import Materials from './pages/Materials';
 import VoiceTest from './pages/VoiceTest';
@@ -11,6 +12,7 @@ import VoiceTest from './pages/VoiceTest';
 function App() {
   return (
     <BrowserRouter>
+      <ServerWakeNotice />
       <Routes>
         <Route path="/" element={<Welcome />} />
         <Route path="/login" element={<Login />} />
