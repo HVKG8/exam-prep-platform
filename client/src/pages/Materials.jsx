@@ -24,7 +24,7 @@ function Materials() {
   const [topicMessage, setTopicMessage] = useState('');
   const [addingTopic, setAddingTopic] = useState(false);
   const [expandedTopics, setExpandedTopics] = useState({});
-  const [visibleCount, setVisibleCount] = useState(9);
+  const [visibleCount, setVisibleCount] = useState(20);
   const [showUpload, setShowUpload] = useState(false);
 
   const [uploadTitle, setUploadTitle] = useState('');
@@ -128,14 +128,14 @@ function Materials() {
     fetchMaterials();
   }, [subjectFilter, typeFilter]);
 
-  // Start again from the first 9 cards whenever the filters change
+  // Start again from the first 20 rows whenever the filters change
   useEffect(() => {
-    setVisibleCount(9);
+    setVisibleCount(20);
   }, [subjectFilter, typeFilter]);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    setVisibleCount(9);
+    setVisibleCount(20);
     fetchMaterials();
   };
 
@@ -263,18 +263,26 @@ function Materials() {
     }
   };
 
-  const getTypeIcon = (type) => {
-    const icons = {
-      notes: '📝',
-      book: '📕',
-      assignment: '🗂️',
-      'question-paper': '📄',
-      diagram: '🖼️',
-      syllabus: '📋',
-      revision: '⚡',
-    };
-    return icons[type] || '📁';
-  };
+  const renderMaterialRow = (m) => (
+    <div key={m._id} className="material-row">
+      <div className="material-row-info">
+        <span className="material-row-title">{m.title}</span>
+        <span className="material-row-meta">
+          {m.subject?.name} · {m.type}
+        </span>
+      </div>
+      <div className="material-row-actions">
+        <button onClick={() => handleDownload(m._id)} className="row-view-btn">
+          View
+        </button>
+        {(userRole === 'teacher' || userRole === 'admin') && (
+          <button onClick={() => handleDelete(m._id)} className="row-delete-btn">
+            Delete
+          </button>
+        )}
+      </div>
+    </div>
+  );
 
   const toggleTopic = (key) => {
     setExpandedTopics((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -388,7 +396,6 @@ function Materials() {
                 ))}
               </div>
             </div>
-            
 
             {loading && <p>Loading...</p>}
             {error && <p className="error-text">{error}</p>}
@@ -410,27 +417,8 @@ function Materials() {
                           </span>
                         </button>
                         {isOpen && (
-                          <div className="materials-grid">
-                            {group.items.map((m) => (
-                              <div key={m._id} className="material-card">
-                                <div className="material-card-icon">{getTypeIcon(m.type)}</div>
-                                <div className="material-card-body">
-                                  <h4 className="material-card-title">{m.title}</h4>
-                                  <p className="material-card-subject">{m.subject?.name}</p>
-                                  <span className="material-card-badge">{m.type}</span>
-                                </div>
-                                <div className="material-card-actions">
-                                  <button onClick={() => handleDownload(m._id)} className="btn-outline">
-                                    Download
-                                  </button>
-                                  {(userRole === 'teacher' || userRole === 'admin') && (
-                                    <button onClick={() => handleDelete(m._id)} className="btn-danger">
-                                      Delete
-                                    </button>
-                                  )}
-                                </div>
-                              </div>
-                            ))}
+                          <div className="materials-rows">
+                            {group.items.map(renderMaterialRow)}
                           </div>
                         )}
                       </div>
@@ -439,33 +427,14 @@ function Materials() {
                 </div>
               ) : (
                 <>
-                  <div className="materials-grid">
-                    {materials.slice(0, visibleCount).map((m) => (
-                      <div key={m._id} className="material-card">
-                        <div className="material-card-icon">{getTypeIcon(m.type)}</div>
-                        <div className="material-card-body">
-                          <h4 className="material-card-title">{m.title}</h4>
-                          <p className="material-card-subject">{m.subject?.name}</p>
-                          <span className="material-card-badge">{m.type}</span>
-                        </div>
-                        <div className="material-card-actions">
-                          <button onClick={() => handleDownload(m._id)} className="btn-outline">
-                            Download
-                          </button>
-                          {(userRole === 'teacher' || userRole === 'admin') && (
-                            <button onClick={() => handleDelete(m._id)} className="btn-danger">
-                              Delete
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                  <div className="materials-rows">
+                    {materials.slice(0, visibleCount).map(renderMaterialRow)}
                   </div>
 
                   {materials.length > visibleCount && (
                     <button
                       className="show-more-btn"
-                      onClick={() => setVisibleCount(visibleCount + 9)}
+                      onClick={() => setVisibleCount(visibleCount + 20)}
                     >
                       Show more ({materials.length - visibleCount} left)
                     </button>
@@ -477,17 +446,18 @@ function Materials() {
             {(userRole === 'teacher' || userRole === 'admin') && (
               <div className="card upload-section">
                 <button
-  type="button"
-  className="upload-toggle"
-  onClick={() => setShowUpload(!showUpload)}
->
-  <span>⬆️ Upload Material</span>
-  <span>{showUpload ? '▴' : '▾'}</span>
-</button>
-<form
-  onSubmit={handleUpload}
-  className={`upload-form ${showUpload ? '' : 'upload-hidden'}`}
->                  <input
+                  type="button"
+                  className="upload-toggle"
+                  onClick={() => setShowUpload(!showUpload)}
+                >
+                  <span>⬆️ Upload Material</span>
+                  <span>{showUpload ? '▴' : '▾'}</span>
+                </button>
+                <form
+                  onSubmit={handleUpload}
+                  className={`upload-form ${showUpload ? '' : 'upload-hidden'}`}
+                >
+                  <input
                     type="text"
                     className="input"
                     placeholder="Title"
@@ -588,8 +558,8 @@ function Materials() {
               </button>
             ))}
           </div>
-          {/* end materials-body */}
         </div>
+        {/* end materials-body */}
       </div>
     </div>
   );
