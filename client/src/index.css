@@ -110,4 +110,24 @@ p {
   --color-border: #1e293b;
   --color-error: #f87171;
   --color-success: #4ade80;
+
+  /* makes native dropdown lists, scrollbars and date pickers dark too */
+  color-scheme: dark;
+}
+
+/* Dark mode: dropdowns and shared inputs */
+:root.dark select {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+:root.dark select option {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+:root.dark .input {
+  background-color: var(--color-surface);
+  color: var(--color-text);
 }
