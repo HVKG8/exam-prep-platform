@@ -292,3 +292,91 @@
   opacity: 0;
   pointer-events: none;
 }
+
+/* ---------- Email verification screens ---------- */
+.check-email {
+  text-align: center;
+}
+
+.check-email-icon {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+.check-email h3 {
+  margin: 0 0 12px;
+  font-size: 22px;
+}
+
+.check-email p {
+  margin: 0 0 12px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.check-email-hint {
+  font-size: 14px;
+  opacity: 0.75;
+}
+
+.check-email .btn {
+  margin-top: 8px;
+}
+
+.check-email .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.check-email-link {
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+}
+
+.check-email-back {
+  all: unset;
+  box-sizing: border-box;
+  display: block;
+  margin: 16px auto 0;
+  font-size: 14px;
+  color: var(--color-primary, #6366f1);
+  cursor: pointer;
+}
+
+.check-email-back:hover {
+  text-decoration: underline;
+}
+
+.success-text {
+  color: #16a34a;
+  font-size: 14px;
+  margin-top: 12px;
+}
+
+.otp-input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 12px 0 8px;
+  padding: 14px;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 10px;
+  border: 1px solid var(--color-border, #d1d5db);
+  border-radius: 10px;
+  background: #ffffff;
+  color: #111827;
+}
+
+.otp-input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.check-email-back:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
