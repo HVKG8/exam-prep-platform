@@ -4,15 +4,18 @@ const router = express.Router();
 const { generateVivaQuestions, evaluateVivaAnswer } = require("../services/aiService");
 const { protect } = require("../middleware/authMiddleware");
 const VivaSession = require("../models/VivaSession");
+const { aiBurstLimiter, aiDailyLimiter } = require("../middleware/aiLimits");
 
 // Start a viva: the AI writes 5 questions and a new session is saved.
-router.post("/start", protect, async (req, res) => {
-  try {
+   router.post("/start", protect, aiBurstLimiter, aiDailyLimiter, async (req, res) => {  try {
     const subject = (req.body.subject || "").trim();
     const topic = (req.body.topic || "").trim();
 
     if (!subject) {
       return res.status(400).json({ message: "Subject is required" });
+    }
+   if (subject.length > 100 || topic.length > 200) {
+     return res.status(400).json({ message: "Subject or topic is too long" });
     }
 
     let questions;
@@ -147,8 +150,7 @@ router.get("/:id", protect, async (req, res) => {
 });
 
 // Send one spoken answer (or follow-up answer) and get feedback.
-router.post("/:id/answer", protect, async (req, res) => {
-  try {
+   router.post("/:id/answer", protect, aiBurstLimiter, aiDailyLimiter, async (req, res) => {  try {
     if (!mongoose.isValidObjectId(req.params.id)) {
       return res.status(404).json({ message: "Viva session not found" });
     }
