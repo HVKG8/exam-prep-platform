@@ -1,7 +1,10 @@
 import { Link, Navigate } from 'react-router-dom'
+import useLightTheme from '../hooks/useLightTheme'
 import './Welcome.css'
 
 function Welcome() {
+  useLightTheme()
+  
   if (localStorage.getItem('token')) {
     return <Navigate to="/dashboard" replace />
   }

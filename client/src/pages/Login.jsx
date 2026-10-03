@@ -3,9 +3,12 @@ import { useState, useRef } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
+import useLightTheme from '../hooks/useLightTheme'
 import './Auth.css'
 
 function Login() {
+  useLightTheme()
+  
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
