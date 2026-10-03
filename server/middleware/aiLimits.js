@@ -1,7 +1,7 @@
 const rateLimit = require("express-rate-limit");
 
 // Change these two numbers if you want stricter or looser limits
-const MAX_PER_MINUTE = 2;
+const MAX_PER_MINUTE = 8;
 const MAX_PER_DAY = 60;
 
 // Counts per logged-in student, not per IP, because many students share
