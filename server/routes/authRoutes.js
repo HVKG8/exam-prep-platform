@@ -115,21 +115,37 @@ const sendCodeEmail = async (user, code, subject, intro) => {
   });
 };
 
-const sendVerificationEmail = (user, code) =>
-  sendCodeEmail(
-    user,
-    code,
-    `${code} is your ExamPrep AI verification code`,
-    "Use this code to verify your email address:"
-  );
+const sendVerificationEmail = async (user, code) => {
+  try {
+    await sendCodeEmail(
+      user,
+      code,
+      `${code} is your ExamPrep AI verification code`,
+      "Use this code to verify your email address:"
+    );
+  } catch (err) {
+    // If the email never left, do not keep the cooldown
+    user.verifyEmailSentAt = undefined;
+    await user.save().catch(() => {});
+    throw err;
+  }
+};
 
-const sendResetEmail = (user, code) =>
-  sendCodeEmail(
-    user,
-    code,
-    `${code} is your ExamPrep AI password reset code`,
-    "Use this code to reset your password:"
-  );
+const sendResetEmail = async (user, code) => {
+  try {
+    await sendCodeEmail(
+      user,
+      code,
+      `${code} is your ExamPrep AI password reset code`,
+      "Use this code to reset your password:"
+    );
+  } catch (err) {
+    // If the email never left, do not keep the cooldown
+    user.resetEmailSentAt = undefined;
+    await user.save().catch(() => {});
+    throw err;
+  }
+};
 
 const onCooldown = (sentAt) =>
   sentAt && Date.now() - new Date(sentAt).getTime() < RESEND_COOLDOWN_MS;
