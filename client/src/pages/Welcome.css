@@ -142,6 +142,171 @@
   line-height: 1.5;
 }
 
+/* ---------- How it works ---------- */
+.welcome-how {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 0 24px 60px;
+}
+
+.welcome-how h2 {
+  font-size: 2rem;
+  color: #1e1b4b;
+  margin: 0 0 28px;
+}
+
+.welcome-steps {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.welcome-step {
+  width: 280px;
+  padding: 8px 12px;
+}
+
+.welcome-step-number {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: #6366f1;
+  color: #ffffff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.welcome-step h3 {
+  margin: 0 0 8px;
+  color: #1e1b4b;
+}
+
+.welcome-step p {
+  margin: 0;
+  color: #475569;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* ---------- Answer preview ---------- */
+.welcome-preview {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 0 24px 60px;
+}
+
+.welcome-preview h2,
+.welcome-subjects h2,
+.welcome-cta h2 {
+  font-size: 2rem;
+  color: #1e1b4b;
+  margin: 0 0 12px;
+}
+
+.welcome-section-sub {
+  color: #475569;
+  margin: 0 0 28px;
+}
+
+.welcome-preview-grid {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.welcome-answer-card {
+  background: #ffffff;
+  border: 1px solid #e0e7ff;
+  border-radius: 16px;
+  padding: 20px;
+  width: 340px;
+  text-align: left;
+}
+
+.welcome-marks-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #6366f1;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.welcome-marks-badge-big {
+  background: #6366f1;
+  color: #ffffff;
+}
+
+.welcome-answer-section {
+  margin-bottom: 12px;
+}
+
+.welcome-answer-section:last-child {
+  margin-bottom: 0;
+}
+
+.welcome-answer-section h4 {
+  margin: 0 0 4px;
+  font-size: 0.9rem;
+  color: #1e1b4b;
+}
+
+.welcome-answer-section p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #475569;
+  line-height: 1.5;
+}
+
+/* ---------- Subjects ---------- */
+.welcome-subjects {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 0 24px 60px;
+}
+
+.welcome-chips {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.welcome-chip {
+  padding: 8px 16px;
+  background: #ffffff;
+  border: 1px solid #c7d2fe;
+  border-radius: 999px;
+  color: #4f46e5;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* ---------- Final call to action ---------- */
+.welcome-cta {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 0 24px 60px;
+}
+
+.welcome-cta p {
+  color: #475569;
+  margin: 0 0 20px;
+}
+
 .welcome-footer {
   position: relative;
   z-index: 1;
@@ -154,4 +319,21 @@
   margin: 0 0 4px;
   font-weight: 600;
   color: #475569;
+}
+
+@media (max-width: 768px) {
+  .welcome-hero h1 {
+    font-size: 2.1rem;
+  }
+
+  .welcome-how h2,
+  .welcome-preview h2,
+  .welcome-subjects h2,
+  .welcome-cta h2 {
+    font-size: 1.5rem;
+  }
+
+  .welcome-answer-card {
+    width: 100%;
+  }
 }
