@@ -13,7 +13,11 @@ function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState('')
+    const [error, setError] = useState(
+    new URLSearchParams(window.location.search).get('expired')
+      ? 'Your session has expired. Please sign in again.'
+      : ''
+  )
   const [pendingEmail, setPendingEmail] = useState(null) // set when the email is not verified yet
   const navigate = useNavigate()
   const hiddenGoogleBtn = useRef(null)

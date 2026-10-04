@@ -98,8 +98,7 @@ function Materials() {
       let url;
 
       if (searchTerm) {
-        url = API_URL + `/api/materials/search?query=${searchTerm}`;
-      } else {
+        url = API_URL + `/api/materials/search?query=${encodeURIComponent(searchTerm.trim())}`;      } else {
         const params = new URLSearchParams();
         if (subjectFilter) params.append('subject', subjectFilter);
         if (typeFilter) params.append('type', typeFilter);
@@ -218,14 +217,21 @@ function Materials() {
       });
       fetchMaterials();
     } catch (err) {
-      alert('Failed to delete material.');
-    }
+      alert(err.response?.data?.message || 'Failed to delete material.');    }
   };
 
   const handleUpload = async (e) => {
     e.preventDefault();
     if (!uploadFile || !uploadTitle || !uploadSubject) {
       setUploadMessage('Please fill in title, subject, and choose a file.');
+      return;
+    }
+
+    const maxMb = 10;
+    if (uploadFile.size > maxMb * 1024 * 1024) {
+      setUploadMessage(
+        `This file is ${(uploadFile.size / 1024 / 1024).toFixed(1)} MB. The maximum is ${maxMb} MB.`
+      );
       return;
     }
 
@@ -257,7 +263,7 @@ function Materials() {
       e.target.reset();
       fetchMaterials();
     } catch (err) {
-      setUploadMessage('Upload failed. Please try again.');
+        setUploadMessage(err.response?.data?.message || 'Upload failed. Please try again.');
     } finally {
       setUploading(false);
     }
@@ -275,7 +281,7 @@ function Materials() {
         <button onClick={() => handleDownload(m._id)} className="row-view-btn">
           View
         </button>
-        {(userRole === 'teacher' || userRole === 'admin') && (
+        {userRole === 'admin' && (
           <button onClick={() => handleDelete(m._id)} className="row-delete-btn">
             Delete
           </button>
@@ -443,7 +449,7 @@ function Materials() {
               )
             )}
 
-            {(userRole === 'teacher' || userRole === 'admin') && (
+            {userRole === 'admin' && (
               <div className="card upload-section">
                 <button
                   type="button"
@@ -531,7 +537,11 @@ function Materials() {
                     </>
                   )}
 
-                  <input type="file" onChange={(e) => setUploadFile(e.target.files[0])} />
+                  <input
+                    type="file"
+                    accept=".pdf,.doc,.docx,.ppt,.pptx,.png,.jpg,.jpeg"
+                    onChange={(e) => setUploadFile(e.target.files[0])}
+                  />                  
                   <button type="submit" className="btn" disabled={uploading}>
                     {uploading ? 'Uploading...' : 'Upload'}
                   </button>
