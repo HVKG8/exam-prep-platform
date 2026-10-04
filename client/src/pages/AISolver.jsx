@@ -5,6 +5,9 @@ import './AISolver.css';
 import MermaidDiagram from '../components/MermaidDiagram';
 import Sidebar from '../components/Sidebar';
 
+const MAX_QUESTION_LENGTH = 1000;
+const SHOW_COUNTER_FROM = 800;
+
 // Turns a camelCase key like "advantages" into a readable label "Advantages"
 function formatLabel(key) {
   return key.charAt(0).toUpperCase() + key.slice(1);
@@ -24,6 +27,19 @@ function answerToPlainText(answer) {
 function formatTime(dateStr) {
   const date = dateStr ? new Date(dateStr) : new Date();
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+// Picks a clear message for the student from whatever went wrong
+function getErrorMessage(err) {
+  if (!err.response) {
+    return 'Could not reach the server. It may be waking up, so please wait a few seconds and try again.';
+  }
+  const status = err.response.status;
+  const serverMessage = err.response.data?.message;
+  if ((status === 400 || status === 429 || status === 503) && serverMessage) {
+    return serverMessage;
+  }
+  return 'Something went wrong. Please try again in a moment.';
 }
 
 const sectionIcons = {
@@ -100,6 +116,8 @@ function AISolver() {
   const [pendingQuestion, setPendingQuestion] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
+  const tooLong = question.length > MAX_QUESTION_LENGTH;
+
   useEffect(() => {
     const loadConversation = async () => {
       if (!selectedConversationId) {
@@ -131,6 +149,13 @@ function AISolver() {
     e.preventDefault();
     const currentQuestion = question.trim();
     if (!currentQuestion) return;
+
+    if (currentQuestion.length > MAX_QUESTION_LENGTH) {
+      setErrorMessage(
+        `Your question is too long. Please keep it under ${MAX_QUESTION_LENGTH} characters.`
+      );
+      return;
+    }
 
     setErrorMessage('');
     setPendingQuestion(currentQuestion);
@@ -178,7 +203,7 @@ function AISolver() {
       setRefreshTrigger((prev) => prev + 1);
     } catch (err) {
       console.error(err);
-      setErrorMessage('The AI is busy right now. Please try again in a moment.');
+      setErrorMessage(getErrorMessage(err));
       setQuestion(currentQuestion);
     } finally {
       setLoading(false);
@@ -188,6 +213,7 @@ function AISolver() {
 
   const handleRegenerate = async (index) => {
     const msg = messages[index];
+    setErrorMessage('');
     setRegeneratingIndex(index);
     try {
       const token = localStorage.getItem('token');
@@ -196,12 +222,28 @@ function AISolver() {
         { question: msg.question, marks: msg.marks },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      const newAnswer = res.data.answer;
+
       const updated = [...messages];
-      updated[index] = { ...updated[index], answer: res.data.answer };
+      updated[index] = { ...updated[index], answer: newAnswer };
       setMessages(updated);
+
+      // Save the new answer, so it is still there after a reload
+      try {
+        await axios.patch(
+          API_URL + `/api/conversations/${selectedConversationId}/messages/${index}`,
+          { answer: newAnswer },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      } catch (saveErr) {
+        console.error(saveErr);
+        setErrorMessage(
+          'The new answer is shown, but it could not be saved. It may disappear when you reload.'
+        );
+      }
     } catch (err) {
       console.error(err);
-      setErrorMessage('The AI is busy right now. Please try again in a moment.');
+      setErrorMessage(getErrorMessage(err));
     } finally {
       setRegeneratingIndex(null);
     }
@@ -336,10 +378,17 @@ function AISolver() {
               onChange={handleQuestionChange}
               rows={1}
             />
-            <button type="submit" className="solver-send-btn" disabled={loading}>
+            <button type="submit" className="solver-send-btn" disabled={loading || tooLong}>
               {loading ? '…' : '➤'}
             </button>
           </div>
+
+          {question.length >= SHOW_COUNTER_FROM && (
+            <div className={`char-counter ${tooLong ? 'over' : ''}`}>
+              {question.length} / {MAX_QUESTION_LENGTH}
+              {tooLong && ' · too long, please shorten your question'}
+            </div>
+          )}
         </form>
       </div>
     </div>

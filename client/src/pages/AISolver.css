@@ -578,3 +578,15 @@
     color: var(--color-text-muted);
   }
 }
+
+.char-counter {
+  padding: 4px 16px 0;
+  font-size: 12px;
+  text-align: right;
+  color: #6b7280;
+}
+
+.char-counter.over {
+  color: #dc2626;
+  font-weight: 600;
+}
