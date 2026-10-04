@@ -172,8 +172,9 @@ function Register() {
                     onChange={(e) => setAgreedToTerms(e.target.checked)}
                   />
                   <span>
-                    I agree to the <a href="#">Terms of Service</a> and{' '}
-                    <a href="#">Privacy Policy</a>
+                    I agree to the{' '}
+                    <a href="/terms" target="_blank" rel="noreferrer">Terms of Service</a> and{' '}
+                    <a href="/privacy" target="_blank" rel="noreferrer">Privacy Policy</a>
                   </span>
                 </label>
               </div>
