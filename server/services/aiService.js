@@ -154,6 +154,74 @@ function parseJsonText(rawText) {
   return JSON.parse(cleaned);
 }
 
+const FENCE = "`".repeat(3);
+
+const DIAGRAM_RULES_MD = `DIAGRAM RULES:
+- Include exactly ONE diagram, written as a fenced code block that starts with ${FENCE}mermaid on its own line and ends with ${FENCE} on its own line. Put it right after the opening explanation, before the detailed points.
+- Choose the type that fits the topic: "flowchart LR" or "flowchart TD" for a process, algorithm or pipeline; "sequenceDiagram" for a protocol or messages between parts; "flowchart TD" with one parent node branching to each item for types or classification; "flowchart TB" with subgraph blocks for an architecture.
+- Use 6 to 12 nodes. Each label must be 1 to 4 words.
+- Write node labels as plain words inside square brackets, like A[Input Data]. Do NOT use double quotes, parentheses, commas, semicolons or special characters inside labels. Colons are allowed only in sequenceDiagram messages.
+- Put each statement on its own line. Add short edge labels only when they add meaning, like A -->|sends| B.
+- For a layered model or stack (like OSI or TCP/IP), use "flowchart TB", one node per layer, top layer first, each label written as the layer number and name, then <br/>, then 2 or 3 example protocols, like L7[7. Application<br/>HTTP, FTP, SMTP]. This <br/> is the only special text allowed inside a label, and only once per label.
+- The diagram must show the real structure of THIS topic, never a generic Input, Process, Output box.`;
+
+function getMarkdownGuide(marks) {
+  if (!marks) {
+    return `No mark value was given. Judge the question yourself:
+- A quick or simple question (a calculation, one fact, a basic definition, or a casual message): answer in 1 to 4 lines. No headings and no diagram.
+- A real concept question: answer like a friendly, experienced teacher. Start with a clear definition, then explain properly. Use headings, bullets or a table only where they make it easier to understand. Add a diagram only if the topic is a process, structure, protocol or classification.
+${DIAGRAM_RULES_MD}`;
+  } else if (marks <= 2) {
+    return `This is a ${marks}-mark question. Keep it short: a direct answer in 2 to 4 lines, with the key term in bold. No headings and NO diagram.`;
+  } else if (marks <= 5) {
+    return `This is a ${marks}-mark question. Write a focused answer of about 150 to 220 words: a clear definition, then the key points as a short bullet or numbered list, then one short example. A diagram is REQUIRED.
+${DIAGRAM_RULES_MD}`;
+  } else {
+    return `This is a ${marks}-mark question. Write a complete exam-quality answer of about 350 to 500 words: a short introduction, the main explanation with headings (use ## for headings), steps or points in lists, a table if you are comparing things, advantages and disadvantages or applications only if the topic naturally has them, one example, and a one or two line summary at the end. A diagram is REQUIRED.
+${DIAGRAM_RULES_MD}`;
+  }
+}
+
+// Removes a code fence if the AI wrapped its whole answer in one.
+function stripOuterFence(text) {
+  const t = text.trim();
+  const re = new RegExp("^" + FENCE + "(?:markdown|md)\\s*\\n([\\s\\S]*)\\n" + FENCE + "$", "i");
+  const m = t.match(re);
+  return m ? m[1].trim() : t;
+}
+
+// New style answer: natural Markdown text (like ChatGPT) instead of fixed JSON sections.
+async function askGeminiMarkdown(question, marks) {
+  const marksLine = marks
+    ? `Marks: ${marks}`
+    : `Marks: not specified, decide the depth yourself`;
+
+  const prompt = `You are a friendly, expert AI tutor helping an engineering student prepare for exams. Write the way ChatGPT would: clear, natural, simple English, like a good teacher explaining face to face.
+
+Question: ${question}
+${marksLine}
+
+${getMarkdownGuide(marks)}
+
+PRIORITY RULE (overrides everything above): if the question itself asks for a specific length or style (for example "in one line", "briefly", "in short", "in simple words", "explain like I'm 5"), obey it exactly: write only that short answer, with no headings and no diagram.
+
+STYLE RULES:
+- Write in Markdown. Start directly with the answer: no "Sure!", no "Great question", no repeating the question.
+- Use ## for headings (never #). Use **bold** for key terms. Use numbered lists for steps and bullet lists for points. Use a table when comparing things.
+- Do not use headings named "Introduction" or "Conclusion". Do not add filler sections just to look complete.
+- Put code in fenced code blocks with the language name. Write formulas in plain text.
+- Do not wrap your whole answer in a code block.`;
+
+  const rawText = await callGemini(prompt, { timeout: 25000 });
+  const markdown = stripOuterFence(rawText);
+
+  if (!markdown) {
+    throw new Error("The AI returned an empty answer");
+  }
+
+  return { markdown };
+}
+
 // Asks Gemini for short spoken-style viva questions.
 async function generateVivaQuestions(subject, topic, count = 5) {
   const topicLine = topic
@@ -264,4 +332,4 @@ readiness: "needs_practice" = mostly missing or wrong, "getting_there" = partly 
   };
 }
 
-module.exports = { askGemini, generateVivaQuestions, evaluateVivaAnswer };
+module.exports = { askGemini,askGeminiMarkdown, generateVivaQuestions, evaluateVivaAnswer };

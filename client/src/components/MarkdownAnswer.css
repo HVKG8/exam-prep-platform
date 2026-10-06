@@ -1,0 +1,79 @@
+.md-answer {
+  line-height: 1.65;
+  font-size: 15px;
+}
+
+.md-answer > *:first-child {
+  margin-top: 0;
+}
+
+.md-answer p {
+  margin: 0 0 12px;
+}
+
+.md-answer h2 {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 18px 0 8px;
+  color: #4338ca;
+}
+
+.md-answer h3 {
+  font-size: 15.5px;
+  font-weight: 700;
+  margin: 14px 0 6px;
+}
+
+.md-answer ul,
+.md-answer ol {
+  margin: 0 0 12px;
+  padding-left: 22px;
+}
+
+.md-answer li {
+  margin-bottom: 6px;
+}
+
+.md-answer strong {
+  font-weight: 700;
+}
+
+.md-inline-code {
+  background: rgba(99, 102, 241, 0.12);
+  padding: 1px 6px;
+  border-radius: 5px;
+  font-size: 0.9em;
+}
+
+.md-code {
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13.5px;
+  margin: 0 0 12px;
+}
+
+.md-table-wrap {
+  overflow-x: auto;
+  margin: 0 0 12px;
+}
+
+.md-answer table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 14px;
+}
+
+.md-answer th,
+.md-answer td {
+  border: 1px solid #c7d2fe;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.md-answer th {
+  background: #eef2ff;
+  color: #1e1b4b;
+}

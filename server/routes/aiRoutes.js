@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { askGemini } = require("../services/aiService");
+const { askGeminiMarkdown } = require("../services/aiService");
 const { protect } = require("../middleware/authMiddleware");
 const { aiBurstLimiter, aiDailyLimiter } = require("../middleware/aiLimits");
 const Question = require("../models/Question");
@@ -34,7 +34,7 @@ router.post("/solve", protect, aiBurstLimiter, aiDailyLimiter, async (req, res) 
 
     let answer;
     try {
-      answer = await askGemini(question, marks);
+      answer = await askGeminiMarkdown(question, marks);
     } catch (aiError) {
       console.error("AI solve error:", aiError.message);
       return res.status(503).json({

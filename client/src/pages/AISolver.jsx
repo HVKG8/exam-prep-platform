@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import './AISolver.css';
 import MermaidDiagram from '../components/MermaidDiagram';
+import MarkdownAnswer from '../components/MarkdownAnswer';
 import Sidebar from '../components/Sidebar';
 
 const MAX_QUESTION_LENGTH = 1000;
@@ -14,6 +15,7 @@ function formatLabel(key) {
 }
 
 function answerToPlainText(answer) {
+  if (answer.markdown) return answer.markdown;
   return Object.entries(answer)
     .filter(([, value]) => value !== null && value !== undefined && value !== '')
     .map(([key, value]) => {
@@ -300,14 +302,21 @@ function AISolver() {
                   <div className="chat-row assistant-row">
                     <div className="chat-avatar bot-avatar">🤖</div>
                     <div className="chat-bubble assistant-bubble">
-                      {sortedEntries(msg.answer).map(([key, value]) => (
-                        <AnswerSection
-                          key={key}
-                          label={key}
-                          value={value}
+                      {msg.answer?.markdown ? (
+                        <MarkdownAnswer
+                          text={msg.answer.markdown}
                           question={msg.question}
                         />
-                      ))}
+                      ) : (
+                        sortedEntries(msg.answer).map(([key, value]) => (
+                          <AnswerSection
+                            key={key}
+                            label={key}
+                            value={value}
+                            question={msg.question}
+                          />
+                        ))
+                      )}
                       <div className="assistant-bubble-footer">
                         <button
                           onClick={() => handleCopy(index, msg.answer)}
