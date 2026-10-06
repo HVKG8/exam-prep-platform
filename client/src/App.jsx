@@ -7,10 +7,13 @@ import Privacy from './pages/Privacy'
 import Terms from './pages/Terms'
 import Dashboard from './pages/Dashboard'
 import ProtectedRoute from './components/ProtectedRoute'
+import AdminRoute from './components/AdminRoute'
 import ServerWakeNotice from './components/ServerWakeNotice'
 import AISolver from './pages/AISolver';
 import Materials from './pages/Materials';
 import Viva from './pages/Viva';
+import Admin from './pages/Admin';
+import AdminLayout from './components/AdminLayout';
 
 function App() {
   return (
@@ -34,6 +37,18 @@ function App() {
         <Route path="/solver" element={<ProtectedRoute><AISolver /></ProtectedRoute>} />
         <Route path="/materials" element={<ProtectedRoute><Materials /></ProtectedRoute>} />
         <Route path="/viva" element={<ProtectedRoute><Viva /></ProtectedRoute>} />
+                <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminRoute>
+                <AdminLayout />
+              </AdminRoute>
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Admin />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   )

@@ -8,6 +8,7 @@ const noteRoutes = require("./routes/noteRoutes");
 const materialRoutes = require("./routes/materialRoutes");
 const conversationRoutes = require("./routes/conversationRoutes");
 const cors = require("cors");
+const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 app.disable("x-powered-by");
@@ -58,6 +59,7 @@ app.use("/api/ai", require("./routes/aiRoutes"));
 app.use("/api/materials", materialRoutes);
 app.use("/api/conversations", conversationRoutes);
 app.use("/api/viva", require("./routes/vivaRoutes"));
+app.use("/api/admin", adminRoutes);
 
 app.use((err, req, res, next) => {
   if (err.type === "entity.parse.failed") {

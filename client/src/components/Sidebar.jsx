@@ -151,11 +151,14 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
     navigate("/login");
   };
 
-  const navLinks = [
+    const navLinks = [
     { to: "/dashboard", label: "Home", icon: "🏠" },
     { to: "/materials", label: "Material", icon: "📘" },
     { to: "/solver", label: "AI Tutor", icon: "🤖" },
     { to: "/viva", label: "Viva Prep", icon: "🎤" },
+    ...(user && user.role === "admin"
+      ? [{ to: "/admin", label: "Admin", icon: "🛡️" }]
+      : []),
   ];
 
   return (
