@@ -125,8 +125,7 @@ function MermaidDiagram({ chart, title }) {
         if (cancelled) return;
         console.error('Mermaid render error:', err);
         setLoading(false);
-        setError('Could not draw the diagram for this answer.');
-      });
+        setError('Could not draw this diagram. Please press Regenerate to try again.');      });
 
     return () => {
       cancelled = true;

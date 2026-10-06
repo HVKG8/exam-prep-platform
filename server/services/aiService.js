@@ -208,6 +208,140 @@ ${parts.join("\n\n")}
 `;
 }
 
+// ---------- Work out what the student is really asking for ----------
+function detectIntent(question) {
+  const q = String(question || "").toLowerCase();
+  const wantsExplain = /\b(explain|describe|discuss|elaborate|define|working|how does|how do|why)\b/.test(q);
+  const wantsDiagram = /\b(draw|sketch|diagram|flowchart|flow chart|schematic)\b/.test(q);
+
+  if (/\b(differentiate|difference|differences|distinguish|compare|comparison|contrast|versus|vs)\b/.test(q)) {
+    return "compare";
+  }
+  if (
+    wantsDiagram &&
+    !/\b(explain|describe|discuss|define|write|note|elaborate|working|advantages|disadvantages|types)\b/.test(q)
+  ) {
+    return "diagram";
+  }
+  if (
+    /\b(write|give|implement|develop|create|code)\b[^.?]*\b(program|code|script|function|query|queries|python|java|sql|javascript)\b/.test(q) &&
+    !/\b(note|explain|describe|discuss|about|difference)\b/.test(q)
+  ) {
+    return "code";
+  }
+  if (/\b(calculate|compute|solve|numerical|evaluate|find the)\b/.test(q) && /\d/.test(q)) {
+    return "numerical";
+  }
+  if (
+    /\b(advantages?|disadvantages?|merits?|demerits?|pros|cons|drawbacks?|limitations?)\b/.test(q) &&
+    !wantsExplain &&
+    !wantsDiagram
+  ) {
+    return "proscons";
+  }
+  if (
+    /\b(types?|kinds?|classification|classify|categories|categorize)\b/.test(q) &&
+    !wantsExplain &&
+    !wantsDiagram
+  ) {
+    return "types";
+  }
+  if (/\bexamples?\b/.test(q) && !wantsExplain && !wantsDiagram) {
+    return "example";
+  }
+  return "general";
+}
+
+// Picks a number by marks: up to 2 marks, up to 5 marks, more than 5 marks (or no marks = middle)
+function pointCount(marks, small, mid, big) {
+  if (!marks) return mid;
+  if (marks <= 2) return small;
+  if (marks <= 5) return mid;
+  return big;
+}
+
+const DIAGRAM_BEST_RULES = `BEST-DIAGRAM RULES:
+- Pick the type that explains this topic best: "flowchart TB" for layers, hierarchies and architectures; "flowchart LR" for a process or pipeline of 6 steps or fewer; "flowchart TD" for decisions and algorithms; "sequenceDiagram" for protocols and message exchanges.
+- Make it complete and correct: every main part of the topic must appear, in the right order. Use the node count given for this question.
+- Each label is 1 to 4 words. A second short line is allowed with <br/> (only once per label), for example L7[7. Application<br/>HTTP, FTP].
+- Group related parts with subgraph blocks that have a short title, like: subgraph G1[Client Side] ... end. Never use the single word "end" as a label.
+- Flowcharts only: color the groups of parts with at most 3 classes, written at the very end, and apply them only to node ids that exist. Example:
+classDef input fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
+classDef process fill:#ede9fe,stroke:#7c3aed,color:#3b0764
+classDef output fill:#dcfce7,stroke:#16a34a,color:#14532d
+class A,B input
+- Sequence diagrams: start with autonumber, give each participant a clear short name, keep messages short, and use Note over X,Y: short text to show states.
+- Node ids are simple letters or short words with no spaces (A, B, C1). Edge labels are short, like A -->|sends| B.
+- No double quotes, parentheses, commas or semicolons inside labels. Colons are allowed only in sequenceDiagram messages.
+- Put each statement on its own line.`;
+
+function getIntentGuide(intent, marks) {
+  const FENCE_MM = FENCE + "mermaid";
+
+    if (intent === "compare") {
+    const rows = pointCount(marks, "4 to 5", "6 to 8", "10 to 12");
+    return `The student wants a DIFFERENCE or COMPARISON. Give ONLY a Markdown table, nothing else.
+- The table has 3 columns: "Basis", then one column for each thing being compared, using the real names as column headers.
+- ${rows} rows (never fewer, never more). Each row is a different, meaningful point of difference chosen for this topic (for example definition, working, speed, reliability, use, advantages, disadvantages, example). Do not repeat the same point in two rows. Keep every cell short, at most 12 words.
+- No introduction, no heading, no diagram, no example section.
+${marks && marks > 2 ? '- After the table add ONE line: "**In short:**" followed by the single most important difference.' : "- Nothing after the table."}`;
+  }
+
+  if (intent === "diagram") {
+    const nodes = pointCount(marks, "6 to 8", "8 to 12", "12 to 16");
+    return `The student wants ONLY A DIAGRAM. Give exactly this, and nothing else:
+1. One diagram written as a fenced code block that starts with ${FENCE_MM} on its own line and ends with ${FENCE} on its own line. Use ${nodes} nodes.
+2. Then ONE short line starting with "*How to read it:*" that explains the flow in one sentence.
+No heading, no definition, no other text. If the question refers to an earlier topic in the chat (like "draw it"), draw that topic.
+${DIAGRAM_BEST_RULES}`;
+  }
+
+  if (intent === "proscons") {
+    const n = pointCount(marks, 2, 4, 6);
+    return `The student wants ONLY ADVANTAGES and/or DISADVANTAGES. Give only what was asked, nothing else.
+- Use a ## heading "Advantages" and/or "Disadvantages" (only the ones asked for), each with exactly ${n} bullet points.
+- Each bullet: a **bold keyword**, then a short phrase (at most 15 words).
+- No introduction, no definition, no conclusion, no diagram.`;
+  }
+
+  if (intent === "types") {
+    const n = pointCount(marks, 3, 5, 7);
+    const tree =
+      marks && marks >= 5
+        ? `\n- After the list, add one small classification tree: a fenced code block starting with ${FENCE_MM}, a "flowchart TD" with the topic as the top node and the types below it (6 to 9 nodes), then ending with ${FENCE}. Follow these rules: labels are 1 to 4 words, no double quotes, parentheses, commas or semicolons inside labels, each statement on its own line.`
+        : "\n- No diagram.";
+    return `The student wants ONLY THE TYPES / CLASSIFICATION. Give only that.
+- A numbered list of exactly ${n} types. Each item: **Type name**: one clear line (at most 20 words) saying what makes it that type.${tree}
+- No introduction, no definition, no conclusion.`;
+  }
+
+  if (intent === "example") {
+    const n = pointCount(marks, 1, 1, 2);
+    return `The student wants ONLY AN EXAMPLE. Give exactly ${n} clear, exam-friendly example${n > 1 ? "s" : ""}, each with a short bold title, and explained step by step in simple words.
+- Do not repeat the definition. No introduction, no conclusion, no diagram.
+- Use a small code block only if the example is about code.`;
+  }
+
+  if (intent === "numerical") {
+    return `The student wants a NUMERICAL problem solved. Give only the solution.
+1. **Given:** the values from the question.
+2. **Formula:** the formula or rule used.
+3. **Solution:** numbered steps with the working shown clearly.
+4. **Final answer:** in bold, with the unit.
+No theory, no introduction, no diagram. Double-check the arithmetic before answering.`;
+  }
+
+  if (intent === "code") {
+    return `The student wants a PROGRAM or QUERY. Give:
+1. The complete, correct, runnable code in one fenced code block with the language name, with short comments.
+2. **Sample output:** a short example input and output.
+3. **How it works:** ${marks && marks > 5 ? "4 to 6" : "2 to 4"} short lines.
+No long introduction, no diagram unless the question asks for a flowchart.`;
+  }
+
+  return getMarkdownGuide(marks);
+}
+
 // New style answer: natural Markdown text (like ChatGPT) instead of fixed JSON sections.
 function buildMarkdownPrompt(question, marks, history = []) {
   const marksLine = marks
@@ -215,6 +349,8 @@ function buildMarkdownPrompt(question, marks, history = []) {
     : `Marks: not specified, decide the depth yourself`;
 
   const historyBlock = buildHistoryBlock(history);
+  const intent = detectIntent(question);
+  console.log("Question type:", intent);
 
   return `You are a friendly, expert AI tutor helping an engineering student prepare for exams. Write the way ChatGPT would: clear, natural, simple English, like a good teacher explaining face to face.
 
@@ -222,7 +358,7 @@ ${historyBlock}
 Question: ${question}
 ${marksLine}
 
-${getMarkdownGuide(marks)}
+${getIntentGuide(intent, marks)}
 
 FOLLOW-UP RULE (overrides the structure above): if the question depends on the earlier chat (for example "explain simpler", "give an example", "why?", "what about UDP?"), use the earlier chat to understand it. If it asks you to simplify, clarify or give an example, answer only that, directly, without repeating the earlier answer, and do not add a diagram unless the student asks for one. If the question is about a new topic, ignore the earlier chat.
 
