@@ -110,3 +110,16 @@
   font-size: 13px;
   color: #64748b;
 }
+
+@media (max-width: 640px) {
+  .md-canvas {
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+
+  .md-canvas svg {
+    min-width: 560px;
+    max-width: none !important;
+    flex-shrink: 0;
+  }
+}

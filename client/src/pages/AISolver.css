@@ -590,3 +590,27 @@
   color: #dc2626;
   font-weight: 600;
 }
+
+.followup-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.followup-chip {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4338ca;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  border-radius: 999px;
+}
+
+.followup-chip:hover {
+  background: #e0e7ff;
+}

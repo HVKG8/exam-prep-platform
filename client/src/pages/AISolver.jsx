@@ -8,6 +8,14 @@ import Sidebar from '../components/Sidebar';
 
 const MAX_QUESTION_LENGTH = 1000;
 const SHOW_COUNTER_FROM = 800;
+const FENCE = '`'.repeat(3);
+
+// Quick follow-up buttons shown under the last answer
+const FOLLOW_UPS = [
+  { icon: '🧒', label: 'Explain simpler', text: 'Explain simpler' },
+  { icon: '💡', label: 'Give an example', text: 'Give an example' },
+  { icon: '📝', label: 'Summarize in 3 lines', text: 'Summarize this in 3 lines' },
+];
 
 // Turns a camelCase key like "advantages" into a readable label "Advantages"
 function formatLabel(key) {
@@ -24,6 +32,28 @@ function answerToPlainText(answer) {
       return `${label}:\n${Array.isArray(value) ? '- ' + text : text}`;
     })
     .join('\n\n');
+}
+
+// The last few messages, sent along so the AI understands follow-up questions
+function buildHistory(list) {
+  return list.slice(-4).map((m) => ({
+    question: m.question,
+    answer: answerToPlainText(m.answer).slice(0, 1500),
+  }));
+}
+
+// While the answer is still being written, a half-finished diagram cannot be drawn.
+// So we hide it until its closing fence arrives.
+function prepareStreamingText(text) {
+  const fenceCount = text.split(FENCE).length - 1;
+  if (fenceCount % 2 === 1) {
+    const idx = text.lastIndexOf(FENCE);
+    const rest = text.slice(idx + FENCE.length).trimStart().toLowerCase();
+    if (rest.startsWith('mermaid') || rest === '' || 'mermaid'.startsWith(rest)) {
+      return text.slice(0, idx) + '\n\n*Drawing diagram…*';
+    }
+  }
+  return text;
 }
 
 function formatTime(dateStr) {
@@ -116,6 +146,7 @@ function AISolver() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [regeneratingIndex, setRegeneratingIndex] = useState(null);
   const [pendingQuestion, setPendingQuestion] = useState('');
+  const [streamingText, setStreamingText] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
   const tooLong = question.length > MAX_QUESTION_LENGTH;
@@ -140,17 +171,18 @@ function AISolver() {
     loadConversation();
   }, [selectedConversationId]);
 
-  // Auto-scroll to the bottom whenever messages change or a new question is pending
+  // Auto-scroll to the bottom whenever messages change, a question is pending, or text is streaming in
   useEffect(() => {
     if (chatScrollRef.current) {
       chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
     }
-  }, [messages, pendingQuestion]);
+  }, [messages, pendingQuestion, streamingText]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const currentQuestion = question.trim();
-    if (!currentQuestion) return;
+  // Sends a question to the AI and shows the answer as it is written.
+  // fromInput = true when the text came from the typing box (so we can put it back if it fails).
+  const sendQuestion = async (text, marksValue, fromInput) => {
+    const currentQuestion = text.trim();
+    if (!currentQuestion || loading) return;
 
     if (currentQuestion.length > MAX_QUESTION_LENGTH) {
       setErrorMessage(
@@ -161,22 +193,81 @@ function AISolver() {
 
     setErrorMessage('');
     setPendingQuestion(currentQuestion);
-    setQuestion('');
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
+    setStreamingText('');
+    if (fromInput) {
+      setQuestion('');
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+      }
     }
     setLoading(true);
 
     try {
       const token = localStorage.getItem('token');
 
-      // Step 1: get the AI answer
-      const res = await axios.post(
-        API_URL + '/api/ai/solve',
-        { question: currentQuestion, marks },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      const newAnswer = res.data.answer;
+      // Step 1: get the AI answer, piece by piece
+      const res = await fetch(API_URL + '/api/ai/solve-stream', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          question: currentQuestion,
+          marks: marksValue,
+          history: buildHistory(messages),
+        }),
+      });
+
+      if (!res.ok) {
+        let data = {};
+        try {
+          data = await res.json();
+        } catch (parseErr) {
+          // the server did not send JSON, so we use the generic message
+        }
+        const failure = new Error('Request failed');
+        failure.response = { status: res.status, data };
+        throw failure;
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let full = '';
+      let newAnswer = null;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        const events = buffer.split('\n\n');
+        buffer = events.pop();
+
+        for (const evt of events) {
+          const line = evt.trim();
+          if (!line.startsWith('data:')) continue;
+          const data = JSON.parse(line.slice(5).trim());
+
+          if (data.type === 'chunk') {
+            full += data.text;
+            setStreamingText(full);
+          } else if (data.type === 'done') {
+            newAnswer = data.answer;
+          } else if (data.type === 'error') {
+            const failure = new Error(data.message);
+            failure.response = { status: 503, data: { message: data.message } };
+            throw failure;
+          }
+        }
+      }
+
+      if (!newAnswer) {
+        const failure = new Error('The answer did not finish');
+        failure.response = { status: 500, data: {} };
+        throw failure;
+      }
 
       // Step 2: make sure we have a conversation to save into
       let conversationId = selectedConversationId;
@@ -193,24 +284,35 @@ function AISolver() {
       // Step 3: save this question+answer into the conversation
       await axios.post(
         API_URL + `/api/conversations/${conversationId}/messages`,
-        { question: currentQuestion, marks, answer: newAnswer },
+        { question: currentQuestion, marks: marksValue, answer: newAnswer },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // Step 4: show it immediately in the chat
+      // Step 4: show it in the chat
       setMessages([
         ...messages,
-        { question: currentQuestion, marks, answer: newAnswer, createdAt: new Date().toISOString() },
+        {
+          question: currentQuestion,
+          marks: marksValue,
+          answer: newAnswer,
+          createdAt: new Date().toISOString(),
+        },
       ]);
       setRefreshTrigger((prev) => prev + 1);
     } catch (err) {
       console.error(err);
       setErrorMessage(getErrorMessage(err));
-      setQuestion(currentQuestion);
+      if (fromInput) setQuestion(currentQuestion);
     } finally {
       setLoading(false);
       setPendingQuestion('');
+      setStreamingText('');
     }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    sendQuestion(question, marks, true);
   };
 
   const handleRegenerate = async (index) => {
@@ -221,7 +323,11 @@ function AISolver() {
       const token = localStorage.getItem('token');
       const res = await axios.post(
         API_URL + '/api/ai/solve',
-        { question: msg.question, marks: msg.marks },
+        {
+          question: msg.question,
+          marks: msg.marks,
+          history: buildHistory(messages.slice(0, index)),
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const newAnswer = res.data.answer;
@@ -332,6 +438,21 @@ function AISolver() {
                           🔄 {regeneratingIndex === index ? 'Regenerating...' : 'Regenerate'}
                         </button>
                       </div>
+
+                      {index === messages.length - 1 && !loading && (
+                        <div className="followup-row">
+                          {FOLLOW_UPS.map((f) => (
+                            <button
+                              key={f.label}
+                              type="button"
+                              className="followup-chip"
+                              onClick={() => sendQuestion(f.text, '', false)}
+                            >
+                              {f.icon} {f.label}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -348,11 +469,20 @@ function AISolver() {
 
                   <div className="chat-row assistant-row">
                     <div className="chat-avatar bot-avatar">🤖</div>
-                    <div className="chat-bubble assistant-bubble typing-bubble">
-                      <span className="typing-dot"></span>
-                      <span className="typing-dot"></span>
-                      <span className="typing-dot"></span>
-                    </div>
+                    {streamingText ? (
+                      <div className="chat-bubble assistant-bubble">
+                        <MarkdownAnswer
+                          text={prepareStreamingText(streamingText)}
+                          question={pendingQuestion}
+                        />
+                      </div>
+                    ) : (
+                      <div className="chat-bubble assistant-bubble typing-bubble">
+                        <span className="typing-dot"></span>
+                        <span className="typing-dot"></span>
+                        <span className="typing-dot"></span>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
