@@ -5,6 +5,7 @@ import "./AdminLayout.css";
 const adminLinks = [
   { to: "/admin", label: "Overview", icon: "📊", end: true },
   { to: "/admin/users", label: "Users", icon: "👥" },
+  { to: "/admin/materials", label: "Materials", icon: "📘" },
 ];
 
 function AdminLayout() {
