@@ -1,0 +1,112 @@
+.md-card {
+  background: #ffffff;
+  border: 1px solid #e0e7ff;
+  border-radius: 14px;
+  overflow: hidden;
+  margin: 8px 0 12px;
+}
+
+.md-toolbar,
+.md-modal-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #f5f7ff;
+  border-bottom: 1px solid #e0e7ff;
+}
+
+.md-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4338ca;
+}
+
+.md-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.md-btn {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  padding: 5px 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #4338ca;
+  background: #ffffff;
+  border: 1px solid #c7d2fe;
+  border-radius: 8px;
+}
+
+.md-btn:hover {
+  background: #eef2ff;
+}
+
+.md-close {
+  color: #475569;
+}
+
+.md-zoom {
+  min-width: 42px;
+  text-align: center;
+  font-size: 12.5px;
+  color: #475569;
+}
+
+.md-canvas {
+  display: flex;
+  justify-content: center;
+  padding: 14px;
+  cursor: zoom-in;
+}
+
+.md-canvas svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.md-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.md-modal {
+  background: #ffffff;
+  border-radius: 14px;
+  width: min(1100px, 100%);
+  height: min(88vh, 900px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.md-modal-body {
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+}
+
+.md-modal-inner {
+  margin: 0 auto;
+  min-width: 280px;
+}
+
+.md-modal-inner svg {
+  width: 100%;
+  height: auto;
+  max-width: none !important;
+}
+
+.diagram-loading {
+  font-size: 13px;
+  color: #64748b;
+}

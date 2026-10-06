@@ -68,7 +68,7 @@ function sortedEntries(answer) {
   });
 }
 
-function AnswerSection({ label, value }) {
+function AnswerSection({ label, value, question }) {
   if (value === null || value === undefined || value === '') return null;
 
   if (label === 'diagram') {
@@ -78,7 +78,7 @@ function AnswerSection({ label, value }) {
           <span className="answer-section-icon">📊</span>
           {formatLabel(label)}
         </h4>
-        <MermaidDiagram chart={value} />
+        <MermaidDiagram chart={value} title={question} />
       </div>
     );
   }
@@ -301,7 +301,12 @@ function AISolver() {
                     <div className="chat-avatar bot-avatar">🤖</div>
                     <div className="chat-bubble assistant-bubble">
                       {sortedEntries(msg.answer).map(([key, value]) => (
-                        <AnswerSection key={key} label={key} value={value} />
+                        <AnswerSection
+                          key={key}
+                          label={key}
+                          value={value}
+                          question={msg.question}
+                        />
                       ))}
                       <div className="assistant-bubble-footer">
                         <button

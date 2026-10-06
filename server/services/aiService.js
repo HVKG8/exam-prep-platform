@@ -13,6 +13,15 @@ const MODELS = [
   "gemini-3.7-flash",
 ];
 
+const DIAGRAM_RULES = `DIAGRAM RULES (the "diagram" value is raw Mermaid syntax inside a JSON string):
+- Choose the diagram type that fits the topic: "flowchart LR" or "flowchart TD" for a process, algorithm or pipeline; "sequenceDiagram" for a protocol or messages between parts; "flowchart TD" with one parent node branching to each item for types or classification; "flowchart TB" with subgraph blocks for an architecture or layered model.
+- Use 6 to 12 nodes. Each label must be 1 to 4 words.
+- Write node labels as plain words inside square brackets, like A[Input Data]. Do NOT use double quotes, parentheses, commas, semicolons or special characters inside labels. Colons are allowed only in sequenceDiagram messages.
+- Put each statement on its own line, separated by \\n.
+- Add short edge labels only when they add meaning, like A -->|sends| B.
+- For a layered model or stack (like OSI or TCP/IP), use "flowchart TB" with one node per layer, top layer first. Write each label as the layer number and name, then <br/>, then 2 or 3 example protocols or the data unit, like L7[7. Application<br/>HTTP, FTP, SMTP]. This <br/> is the only special text allowed inside a label, and only once per label.
+- The diagram must show the real structure of THIS topic, never a generic Input, Process, Output box.`;
+
 function getStructureGuide(marks) {
   if (!marks) {
     return `No specific mark value was given. First judge the question yourself:
@@ -28,15 +37,16 @@ Do NOT include introduction, diagram, advantages, disadvantages, applications, t
   } else if (marks <= 5) {
     return `For a ${marks}-mark question, include:
 - "definition": the core concept/definition
-- "diagram": ONLY if this topic genuinely has a visual/process structure that benefits from a flowchart or block diagram, provide valid Mermaid.js syntax (e.g. "flowchart TD\\nA[Input] --> B[Process] --> C[Output]") as a plain string — otherwise use null. Do NOT include explanations, backticks, or the word "mermaid" — just the raw Mermaid syntax.
+- "diagram": REQUIRED for this mark value, never null. A valid Mermaid.js diagram that visually explains the topic. Raw Mermaid syntax only, no backticks and no word "mermaid".
 - "types": an array of types, ONLY if genuinely applicable - otherwise null
 - "explanation": the key points or working pipeline, as a short paragraph
 - "examples": an array of 1-3 short real-world examples or applications, ONLY if relevant — otherwise null
-Do NOT include introduction, advantages, disadvantages, or conclusion for this mark value.`;
+Do NOT include introduction, advantages, disadvantages, or conclusion for this mark value.
+${DIAGRAM_RULES}`;
   } else {
     return `For a ${marks}-mark question, include a full structured answer:
   - "introduction": 1-3 sentences introducing the topic
-  - "diagram": ONLY if the topic genuinely has a visual structure that benefits from a flowchart or block diagram, provide valid Mermaid.js syntax (e.g. "flowchart TD\\nA[Input] --> B[Process] --> C[Output]") as a plain string — otherwise use null. Do NOT include explanations, backticks, or the word "mermaid" — just the raw Mermaid syntax.
+  - "diagram": REQUIRED for this mark value, never null. A valid Mermaid.js diagram that visually explains the topic. Raw Mermaid syntax only, no backticks and no word "mermaid".
   - "explanation": the main working/explanation in detail (this should be the largest section)
   - "types": an array of types, ONLY if genuinely applicable - otherwise null
   - "advantages": an array of advantage strings, ONLY if genuinely applicable — otherwise null
@@ -44,7 +54,8 @@ Do NOT include introduction, advantages, disadvantages, or conclusion for this m
   - "applications": an array of real-world application strings, ONLY if genuinely applicable — otherwise null
   - "conclusion": 1-2 sentences wrapping up
   - "examples": an array of 1-3 short real-world examples or applications, ONLY if relevant — otherwise null
-Skip advantages/disadvantages/applications individually if the topic doesn't naturally have them (e.g. a purely mathematical or definitional topic) — never invent filler content just to fill a section.`;
+Skip advantages/disadvantages/applications individually if the topic doesn't naturally have them (e.g. a purely mathematical or definitional topic) — never invent filler content just to fill a section.
+${DIAGRAM_RULES}`;
   }
 }
 
@@ -62,7 +73,7 @@ ${getStructureGuide(marks)}
 
 PRIORITY RULE (overrides the structure above): If the student's question itself asks for a specific length or style (for example "in one line", "briefly", "in short", "in simple words", "explain like I'm 5"), obey that instruction exactly. In that case return ONLY {"explanation": "your answer here"} with no other keys.
 
-FORMATTING RULE: Inside any text field (like "explanation"), whenever you list numbered points, conditions, or steps, put each one on its own line, separated by \\n, and start the line with its number (for example "1. Mutual Exclusion: ...\\n2. Hold and Wait: ..."). Do not run them together in one paragraph. Do not repeat the same information in "introduction" and "definition". Every item in "types" must be written as "Name: one-line explanation", never just the name. For diagrams, prefer a compact left-to-right layout (flowchart LR) unless a sequence diagram fits the topic better.
+FORMATTING RULE: Inside any text field (like "explanation"), whenever you list numbered points, conditions, or steps, put each one on its own line, separated by \\n, and start the line with its number (for example "1. Mutual Exclusion: ...\\n2. Hold and Wait: ..."). Do not run them together in one paragraph. Do not repeat the same information in "introduction" and "definition". Every item in "types" must be written as "Name: one-line explanation", never just the name.
 Respond with ONLY a valid JSON object (no markdown code fences, no extra text before or after) using exactly these possible keys: "introduction", "definition", "diagram", "explanation", "types", "advantages", "disadvantages", "applications", "examples", "conclusion". Only include the keys relevant to this mark value as described above; omit or set null any key that doesn't apply. "advantages", "disadvantages", "applications", "types", and "examples" should be arrays of short strings when included. The "diagram" field, when included, must be raw Mermaid.js syntax only (no backticks, no "mermaid" label, no explanation text). All other fields should be plain strings.`;
 
   let lastError;
