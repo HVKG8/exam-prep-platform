@@ -14,6 +14,7 @@ import Materials from './pages/Materials';
 import Viva from './pages/Viva';
 import Admin from './pages/Admin';
 import AdminLayout from './components/AdminLayout';
+import AdminUsers from './pages/AdminUsers';
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
           }
         >
           <Route index element={<Admin />} />
+          <Route path="users" element={<AdminUsers />} />
         </Route>
       </Routes>
     </BrowserRouter>

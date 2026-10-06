@@ -62,4 +62,63 @@ router.get("/stats", async (req, res) => {
   }
 });
 
+// GET /api/admin/users  ->  all users for the Users page
+router.get("/users", async (req, res) => {
+  try {
+    const users = await User.find()
+      .sort({ _id: -1 })
+      .limit(500)
+      .select("name email role createdAt");
+    res.json(users);
+  } catch (err) {
+    console.error("Admin users error:", err.message);
+    res.status(500).json({ message: "Could not load users" });
+  }
+});
+
+// PATCH /api/admin/users/:id/role  ->  change someone's role
+router.patch("/users/:id/role", async (req, res) => {
+  try {
+    const { role } = req.body;
+    if (!["student", "teacher", "admin"].includes(role)) {
+      return res.status(400).json({ message: "Invalid role" });
+    }
+    if (req.user._id.toString() === req.params.id) {
+      return res
+        .status(400)
+        .json({ message: "You cannot change your own role" });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { role },
+      { new: true }
+    ).select("name email role createdAt");
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json(user);
+  } catch (err) {
+    console.error("Admin role error:", err.message);
+    res.status(500).json({ message: "Could not change role" });
+  }
+});
+
+// DELETE /api/admin/users/:id  ->  remove a user
+router.delete("/users/:id", async (req, res) => {
+  try {
+    if (req.user._id.toString() === req.params.id) {
+      return res
+        .status(400)
+        .json({ message: "You cannot delete your own account" });
+    }
+
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json({ message: "User deleted" });
+  } catch (err) {
+    console.error("Admin delete error:", err.message);
+    res.status(500).json({ message: "Could not delete user" });
+  }
+});
+
 module.exports = router;

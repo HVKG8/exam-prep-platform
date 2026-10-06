@@ -1,0 +1,218 @@
+.admin-page-header {
+  margin-bottom: 20px;
+}
+
+.admin-page-header h1 {
+  margin: 0 0 4px;
+  font-size: 26px;
+  color: #0f172a;
+}
+
+.admin-page-header p {
+  margin: 0;
+  color: #64748b;
+}
+
+.admin-error-banner {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  font-size: 14px;
+}
+
+/* ---------- Search + filter ---------- */
+.admin-toolbar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.admin-search {
+  flex: 1;
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.admin-search:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.admin-filter {
+  padding: 12px 16px;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+/* ---------- Table ---------- */
+.admin-table-panel {
+  padding: 8px 12px;
+}
+
+.admin-table-scroll {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 620px;
+}
+
+.admin-table th {
+  text-align: left;
+  font-size: 12px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #94a3b8;
+  padding: 12px 10px;
+  border-bottom: 1px solid #eef1f7;
+}
+
+.admin-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #f1f4f9;
+  vertical-align: middle;
+}
+
+.admin-table tbody tr {
+  transition: background 0.2s;
+}
+
+.admin-table tbody tr:hover {
+  background: #f8f9ff;
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-user-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-you {
+  font-size: 11px;
+  font-weight: 700;
+  background: #eef2ff;
+  color: #4f46e5;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: 6px;
+}
+
+.admin-date-cell {
+  color: #64748b;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.admin-muted {
+  color: #cbd5e1;
+}
+
+.admin-empty {
+  text-align: center;
+  color: #94a3b8;
+  padding: 28px 0 20px;
+}
+
+/* ---------- Role dropdown ---------- */
+.admin-role-select {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-role-select.admin { background: #ede9fe; color: #6d28d9; }
+.admin-role-select.teacher { background: #dbeafe; color: #1d4ed8; }
+.admin-role-select.student { background: #dcfce7; color: #15803d; }
+
+.admin-role-select:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* ---------- Buttons ---------- */
+.admin-btn-ghost,
+.admin-btn-danger {
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #475569;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.admin-btn-delete:hover {
+  background: #fee2e2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.admin-btn-danger {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #fff;
+}
+
+.admin-btn-danger:hover {
+  background: #b91c1c;
+}
+
+.admin-confirm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #475569;
+}
+
+/* ---------- Dark mode ---------- */
+:root.dark .admin-page-header h1 {
+  color: #f1f5f9;
+}
+
+:root.dark .admin-search,
+:root.dark .admin-filter,
+:root.dark .admin-btn-ghost {
+  background: #131c31;
+  border-color: #223049;
+  color: #e2e8f0;
+}
+
+:root.dark .admin-table th {
+  border-bottom-color: #223049;
+}
+
+:root.dark .admin-table td {
+  border-bottom-color: #1a2540;
+}
+
+:root.dark .admin-table tbody tr:hover {
+  background: #1a2540;
+}
+
+@media (max-width: 520px) {
+  .admin-toolbar {
+    flex-direction: column;
+  }
+}
