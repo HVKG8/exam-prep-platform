@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Sidebar.css";
+import Logo from './Logo'
 
 function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refreshTrigger }) {
   const [conversations, setConversations] = useState([]);
@@ -172,7 +173,7 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
           ☰
         </button>
         <span className="mobile-topbar-title">
-          🎓 ExamPrep <span>AI</span>
+          <Logo size={28} /> ExamPrep <span>AI</span>
         </span>
       </div>
 
@@ -182,7 +183,7 @@ function Sidebar({ selectedConversationId, onSelectConversation, onNewChat, refr
 
       <div className={`sidebar ${mobileOpen ? "open" : ""}`}>
         <div className="sidebar-logo">
-          🎓 ExamPrep <span>AI</span>
+          <Logo size={28} /> ExamPrep <span>AI</span>
         </div>
 
         <div className="sidebar-main">

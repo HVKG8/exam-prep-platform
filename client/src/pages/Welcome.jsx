@@ -1,6 +1,7 @@
 import { Link, Navigate } from 'react-router-dom'
 import useLightTheme from '../hooks/useLightTheme'
 import './Welcome.css'
+import Logo from '../components/Logo'
 
 function Welcome() {
   useLightTheme()
@@ -20,7 +21,7 @@ function Welcome() {
   return (
     <div className="welcome-page">
       <nav className="welcome-nav">
-        <div className="welcome-logo">🎓 ExamPrep AI</div>
+        <div className="welcome-logo"><Logo size={36} /> ExamPrep AI</div>
         <Link to="/login" className="welcome-btn welcome-btn-secondary">
           Sign in
         </Link>

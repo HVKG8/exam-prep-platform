@@ -6,6 +6,7 @@ import { GoogleLogin } from '@react-oauth/google'
 import useLightTheme from '../hooks/useLightTheme'
 import CheckEmailNotice from '../components/CheckEmailNotice'
 import './Auth.css'
+import Logo from '../components/Logo'
 
 function Login() {
   useLightTheme()
@@ -67,7 +68,7 @@ function Login() {
     <div className="auth-page">
       <div className="auth-blob-center"></div>
       <div className="auth-logo">
-        <span className="auth-logo-icon">🎓</span>
+        <Logo size={44} />
         <span className="auth-logo-text">ExamPrep <span className="auth-logo-accent">AI</span></span>
       </div>
       <div className="card auth-card">

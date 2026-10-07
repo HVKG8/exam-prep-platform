@@ -1,5 +1,6 @@
 import useLightTheme from '../hooks/useLightTheme'
 import './Legal.css'
+import Logo from './Logo'
 
 function LegalLayout({ title, updated, children }) {
   useLightTheme()
@@ -8,7 +9,7 @@ function LegalLayout({ title, updated, children }) {
     <div className="legal-page">
       <div className="legal-card">
         <a href="/" className="legal-logo">
-          🎓 ExamPrep <span>AI</span>
+          <Logo size={28} /> ExamPrep <span>AI</span>
         </a>
         <h1>{title}</h1>
         <p className="legal-updated">Last updated: {updated}</p>

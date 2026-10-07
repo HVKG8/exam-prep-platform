@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { NavLink, Outlet, Link } from "react-router-dom";
 import "./AdminLayout.css";
+import Logo from "./Logo";
 
 const adminLinks = [
   { to: "/admin", label: "Overview", icon: "📊", end: true },
@@ -29,7 +30,7 @@ function AdminLayout() {
 
       <aside className={`admin-sidebar ${open ? "open" : ""}`}>
         <div className="admin-brand">
-          <span className="admin-brand-logo">🎓</span>
+          <Logo size={44} />
           <div>
             <p className="admin-brand-name">ExamPrep AI</p>
             <span className="admin-brand-badge">ADMIN</span>
