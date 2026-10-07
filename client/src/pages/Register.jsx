@@ -7,6 +7,9 @@ import useLightTheme from '../hooks/useLightTheme'
 import CheckEmailNotice from '../components/CheckEmailNotice'
 import './Auth.css'
 
+// Server messages that belong under the email box (not at the bottom of the card)
+const EMAIL_MESSAGE = /(valid email|did you mean|email domain|already registered|google sign-in)/i
+
 function Register() {
   useLightTheme()
 
@@ -18,10 +21,14 @@ function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [agreedToTerms, setAgreedToTerms] = useState(false)
   const [error, setError] = useState('')
+  const [emailError, setEmailError] = useState('')
   const [pending, setPending] = useState(null) // { email, sendFailed } after signing up
   const navigate = useNavigate()
   const googleWrapRef = useRef(null)
   const [googleWidth, setGoogleWidth] = useState(280)
+
+  // "Did you mean name@gmail.com?" -> name@gmail.com (or null)
+  const suggestion = (emailError.match(/Did you mean (\S+)\?/) || [])[1] || null
 
   // Google's button needs a width in pixels, so match the card on small phones
   useEffect(() => {
@@ -34,6 +41,9 @@ function Register() {
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
+    setEmailError('')
+
+    const cleanEmail = email.trim()
 
     if (password !== confirmPassword) {
       setError('Passwords do not match')
@@ -48,20 +58,26 @@ function Register() {
     try {
       const response = await axios.post(API_URL + '/api/auth/register', {
         name,
-        email,
+        email: cleanEmail,
         password,
       })
       setPending({
-        email: response.data.email || email,
+        email: response.data.email || cleanEmail,
         sendFailed: response.data.emailSent === false,
       })
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed')
+      const message = err.response?.data?.message || 'Registration failed'
+      if (EMAIL_MESSAGE.test(message)) {
+        setEmailError(message)
+      } else {
+        setError(message)
+      }
     }
   }
 
   async function handleGoogleSuccess(credentialResponse) {
     try {
+      setError('')
       const response = await axios.post(API_URL + '/api/auth/google', {
         credential: credentialResponse.credential,
       })
@@ -85,7 +101,7 @@ function Register() {
             email={pending.email}
             justSent={!pending.sendFailed}
             sendFailed={pending.sendFailed}
-            backLabel="← Use a different email"
+            backLabel="Wrong email? Change it"
             onBack={() => setPending(null)}
           />
         ) : (
@@ -123,9 +139,41 @@ function Register() {
                     className="input"
                     placeholder="Enter your email address"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value)
+                      if (emailError) setEmailError('')
+                    }}
                   />
                 </div>
+                {emailError && (
+                  <p className="error-text" style={{ marginTop: 6 }}>
+                    {emailError}
+                    {suggestion && (
+                      <>
+                        {' '}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEmail(suggestion)
+                            setEmailError('')
+                          }}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            padding: 0,
+                            color: '#4f46e5',
+                            fontWeight: 600,
+                            textDecoration: 'underline',
+                            cursor: 'pointer',
+                            font: 'inherit',
+                          }}
+                        >
+                          Use {suggestion}
+                        </button>
+                      </>
+                    )}
+                  </p>
+                )}
               </div>
               <div className="form-group">
                 <label>Password</label>
