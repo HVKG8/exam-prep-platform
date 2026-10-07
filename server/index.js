@@ -47,6 +47,10 @@ app.get("/", (req, res) => {
   res.send("Exam Prep server is running");
 });
 
+app.get('/health', (req, res) => {
+  res.status(200).send('ok');
+});
+
 app.get("/about", (req, res) => {
   res.send("An app to help students prepare for exams");
 });
