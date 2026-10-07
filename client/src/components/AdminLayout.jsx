@@ -6,6 +6,7 @@ const adminLinks = [
   { to: "/admin", label: "Overview", icon: "📊", end: true },
   { to: "/admin/users", label: "Users", icon: "👥" },
   { to: "/admin/materials", label: "Materials", icon: "📘" },
+  { to: "/admin/ai-usage", label: "AI Usage", icon: "🤖" },
 ];
 
 function AdminLayout() {

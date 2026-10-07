@@ -1,0 +1,173 @@
+/* AI Usage page. Cards reuse the .admin-panel look from the other admin pages. */
+
+.aiu-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.aiu-card {
+  padding: 18px 20px;
+}
+
+.aiu-card-label {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.7;
+}
+
+.aiu-card-value {
+  margin: 6px 0 2px;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #6366f1;
+}
+
+.aiu-card-note {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.aiu-section {
+  padding: 18px 20px;
+  margin-bottom: 18px;
+}
+
+.aiu-section-flush {
+  margin-bottom: 18px;
+}
+
+.aiu-table-head {
+  padding: 18px 20px 8px;
+}
+
+.aiu-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.aiu-subtitle {
+  margin: 2px 0 14px;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+/* ---------- Bar chart ---------- */
+.aiu-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 190px;
+}
+
+.aiu-bar-col {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.aiu-bar-value {
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.75;
+  height: 14px;
+}
+
+.aiu-bar-track {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(128, 128, 128, 0.12);
+  overflow: hidden;
+}
+
+.aiu-bar {
+  width: 100%;
+  border-radius: 8px 8px 0 0;
+  background: linear-gradient(180deg, #818cf8, #4f46e5);
+  transition: height 0.4s ease;
+}
+
+.aiu-bar.empty {
+  background: rgba(128, 128, 128, 0.3);
+}
+
+.aiu-bar-label {
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+/* ---------- Top students ---------- */
+.aiu-top-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.aiu-top-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.15);
+}
+
+.aiu-top-row:last-child {
+  border-bottom: none;
+}
+
+.aiu-rank {
+  width: 22px;
+  text-align: center;
+  font-weight: 800;
+  color: #6366f1;
+}
+
+.aiu-top-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.aiu-top-count {
+  font-weight: 800;
+  font-size: 16px;
+}
+
+/* ---------- Recent questions table ---------- */
+.aiu-student-cell {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.aiu-question-cell {
+  min-width: 220px;
+  max-width: 420px;
+}
+
+@media (max-width: 600px) {
+  .aiu-chart {
+    gap: 3px;
+    height: 160px;
+  }
+
+  .aiu-bar-value,
+  .aiu-bar-label {
+    font-size: 9px;
+  }
+
+  .aiu-card-value {
+    font-size: 28px;
+  }
+}

@@ -16,6 +16,7 @@ import Admin from './pages/Admin';
 import AdminLayout from './components/AdminLayout';
 import AdminUsers from './pages/AdminUsers';
 import AdminMaterials from './pages/AdminMaterials';
+import AdminAIUsage from './pages/AdminAIUsage';
 
 function App() {
   return (
@@ -39,7 +40,7 @@ function App() {
         <Route path="/solver" element={<ProtectedRoute><AISolver /></ProtectedRoute>} />
         <Route path="/materials" element={<ProtectedRoute><Materials /></ProtectedRoute>} />
         <Route path="/viva" element={<ProtectedRoute><Viva /></ProtectedRoute>} />
-                <Route
+        <Route
           path="/admin"
           element={
             <ProtectedRoute>
@@ -52,6 +53,7 @@ function App() {
           <Route index element={<Admin />} />
           <Route path="users" element={<AdminUsers />} />
           <Route path="materials" element={<AdminMaterials />} />
+          <Route path="ai-usage" element={<AdminAIUsage />} />
         </Route>
       </Routes>
     </BrowserRouter>
