@@ -13,10 +13,11 @@
 
 > ⏳ The server runs on a free plan and goes to sleep when nobody uses it, so the very first load can take up to a minute. After that it is fast.
 
-<!--
-Screenshots: put images in docs/screenshots/ and add lines like this:
-![AI Tutor](docs/screenshots/ai-tutor.png)
--->
+## 📸 Screenshots
+
+| AI Tutor | Dashboard | Viva Prep |
+|---|---|---|
+| ![AI Tutor](docs/ai-tutor.png) | ![Dashboard](docs/dashboard.png) | ![Viva Prep](docs/viva.png) | ![Materials](docs/materials.png) |
 
 ---
 
