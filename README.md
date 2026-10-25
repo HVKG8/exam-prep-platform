@@ -2,6 +2,13 @@
 
 **Learn smarter. Prepare better.** An AI-powered exam preparation platform for engineering students: marks-aware AI answers, organised study materials, and viva (oral exam) practice.
 
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Express](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+![Gemini](https://img.shields.io/badge/Gemini%20API-4285F4?style=for-the-badge&logo=googlegemini&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
+
 ### 🌐 Live demo: https://examprep-ai-kappa.vercel.app
 
 > ⏳ The server runs on a free plan and goes to sleep when nobody uses it, so the very first load can take up to a minute. After that it is fast.
@@ -17,10 +24,12 @@ Screenshots: put images in docs/screenshots/ and add lines like this:
 
 ### 🤖 AI Tutor
 - Answers scaled to the marks you pick (**2, 5 or 10**), or let the AI decide the depth
-- Structured answers (definition, explanation, types, advantages, conclusion and more) with **Mermaid diagrams** where they help
-- Saved chat history: rename, delete, copy an answer, or **regenerate** it (the new answer is saved)
+- ChatGPT-style **Markdown answers** that stream in live, with clean headings, lists and code
+- **Understands what you ask:** comparisons come as tables, diagram-only requests get just a diagram, plus pros and cons, types, examples, numericals and code
+- **Mermaid diagrams** for longer answers, with zoom and PNG download
+- Remembers the conversation, so you can ask follow-ups (**Explain simpler**, **Give an example**, **Summarize in 3 lines**)
+- Saved chat history: rename, delete, copy an answer, or **regenerate** it
 - Daily and per-minute limits per student, so the free AI quota stays fair for everyone
-
 ### 📚 Study Materials
 - Notes, books, assignments, question papers, diagrams, syllabus and quick revision, organised by **subject and unit**
 - Search, type filters and quick-access shortcuts
