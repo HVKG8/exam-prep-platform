@@ -15,8 +15,8 @@
 
 ## 📸 Screenshots
 
-| AI Tutor | Dashboard | Viva Prep |
-|---|---|---|
+| AI Tutor | Dashboard | Viva Prep | Materials |
+|---|---|---|---|
 | ![AI Tutor](docs/ai-tutor.png.png) | ![Dashboard](docs/dashboard.png.png) | ![Viva Prep](docs/viva.png.png) | ![Materials](docs/materials.png.png) |
 
 ---
