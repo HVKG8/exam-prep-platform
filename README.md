@@ -17,7 +17,7 @@
 
 | AI Tutor | Dashboard | Viva Prep |
 |---|---|---|
-| ![AI Tutor](docs/ai-tutor.png) | ![Dashboard](docs/dashboard.png) | ![Viva Prep](docs/viva.png) | ![Materials](docs/materials.png) |
+| ![AI Tutor](docs/ai-tutor.png.png) | ![Dashboard](docs/dashboard.png.png) | ![Viva Prep](docs/viva.png.png) | ![Materials](docs/materials.png.png) |
 
 ---
 
